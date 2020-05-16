@@ -1,5 +1,6 @@
 package utils;
 
+import javax.swing.table.DefaultTableModel;
 import java.lang.reflect.Field;
 import java.sql.*;
 
@@ -57,53 +58,97 @@ public class DBConnection<T> {
         }
         return false;
     }
-    public int getLastId(){
-        try (Connection con = DriverManager.getConnection(urlConnection)){
+
+    public int getLastId() {
+        try (Connection con = DriverManager.getConnection(urlConnection)) {
             Statement stmt = con.createStatement();
             String query = "SELECT TOP 1 prisonerid FROM prisoner ORDER BY prisonerid DESC ";
             ResultSet rs = stmt.executeQuery(query);
-            if(rs.next()){
+            if (rs.next()) {
                 return rs.getInt(1);
             }
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
-    public String getAllName(String tableName){
-        try (Connection con = DriverManager.getConnection(urlConnection)){
+
+    public String getAllName(String tableName) {
+        try (Connection con = DriverManager.getConnection(urlConnection)) {
             Statement stmt = con.createStatement();
-            String columnName = tableName+"name";
-            String query = "SELECT DISTINCT "+columnName+" FROM "+tableName;
+            String columnName = tableName + "name";
+            String query = "SELECT DISTINCT " + columnName + " FROM " + tableName;
             ResultSet rs = stmt.executeQuery(query);
             String allName = "";
-            while(rs.next()){
-                allName +=rs.getString(columnName) +",";
+            while (rs.next()) {
+                allName += rs.getString(columnName) + ",";
             }
-            allName = allName.substring(0,allName.length()-1); //loai bo dau phay cuoi
+            allName = allName.substring(0, allName.length() - 1); //loai bo dau phay cuoi
             return allName;
-        }catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
-        }return "";
+        }
+        return "";
     }
-    public int getColumnID(String tableName,String columnValue){
-        try(Connection con = DriverManager.getConnection(urlConnection)){
+
+    public int getColumnID(String tableName, String columnValue) {
+        try (Connection con = DriverManager.getConnection(urlConnection)) {
             Statement stmt = con.createStatement();
-            String columnID = tableName+"id";
-            String columnName = tableName+"name";
-            String query = "SELECT "+columnID+" FROM "+tableName+" WHERE "+columnName+ " = N'"+columnValue+"'";
+            String columnID = tableName + "id";
+            String columnName = tableName + "name";
+            String query = "SELECT " + columnID + " FROM " + tableName + " WHERE " + columnName + " = N'" + columnValue + "'";
             ResultSet rs = stmt.executeQuery(query);
-            while (rs.next())
-            {
-                return  rs.getInt(1);
+            while (rs.next()) {
+                return rs.getInt(1);
             }
-        }catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
-}
 
+    public DefaultTableModel findPrisoner(String idCard) {
+        try (Connection con = DriverManager.getConnection(urlConnection);Statement stmt = con.createStatement();) {
+            String query = "findprisonerbyidcard '"+idCard+"'";
+            ResultSet rs = stmt.executeQuery(query);
+            DefaultTableModel model = new DefaultTableModel() {
+                public boolean isCellEditable(int row, int col)/// lam bang k chinh sua dc
+                {
+                    return false;
+                }
+            };
+            model.addColumn("Id Card");
+            model.addColumn("Name");
+            model.addColumn("Age");
+            model.addColumn("Gender");
+            model.addColumn("Date of Birth");
+            model.addColumn("Date of Arrest");
+            model.addColumn("Date of Release");
+            model.addColumn("Crime");
+            model.addColumn("Punishment");
+            model.addColumn("Danger level");
+            model.addColumn("Cell room");
+            while (rs.next()) {
+                String id = rs.getString("prisoneridcard");
+                String name = rs.getString("prisonername");
+                Integer age = rs.getInt("prisonerage");
+                String gender = rs.getString("gender");
+                String DoB = rs.getString("dateofbirth");
+                String DoA = rs.getString("dateofarrest");
+                String DoR = rs.getString("dateofrelease");
+                String crime = rs.getString("crimename");
+                String punishment = rs.getString("punishmentname");
+                Integer danger = rs.getInt("dangerlevel");
+                String cell = rs.getString("cellroomname");
+                model.addRow(new Object[]{id, name, age, gender, DoB, DoA, DoR, crime, punishment, danger,cell});
+            }
+            System.out.println(query);
+            return model;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
