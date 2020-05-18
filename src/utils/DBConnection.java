@@ -107,6 +107,44 @@ public class DBConnection<T> {
         }
         return 0;
     }
+    public DefaultTableModel findRelative(String idCard) {
+        try (Connection con = DriverManager.getConnection(urlConnection); Statement stmt = con.createStatement()) {
+            String query ="findrelativebyidcard '"+ idCard+"'";
+            ResultSet rs = stmt.executeQuery(query);
+            DefaultTableModel model = new DefaultTableModel() {
+                public boolean isCellEditable(int row, int col)/// lam bang k chinh sua dc
+                {
+                    return false;
+                }
+            };
+            model.addColumn("Id Card");
+            model.addColumn("Name");
+            model.addColumn("Age");
+            model.addColumn("Phone");
+            model.addColumn("Address");
+            model.addColumn("City");
+            model.addColumn("Country");
+            model.addColumn("Relationship");
+            while (rs.next()){
+                String id = rs.getString("relativeidcard");
+                String name = rs.getString("relativename");
+                Integer age = rs.getInt("relativeage");
+                String phone = rs.getString("relativephone");
+                String address = rs.getString("relativeaddress");
+                String city = rs.getString("cityname");
+                String country = rs.getString("countryname");
+                String relationship = rs.getString("relationship");
+                model.addRow(new Object[]{id,name,age,phone,address,city,country,relationship});
+            }
+            System.out.println(query);
+            return model;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
 
     public DefaultTableModel findPrisoner(String idCard) {
         try (Connection con = DriverManager.getConnection(urlConnection);Statement stmt = con.createStatement();) {

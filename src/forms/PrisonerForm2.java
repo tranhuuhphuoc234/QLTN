@@ -7,27 +7,22 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Properties;
 
-import models.entities.prisoner;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import utils.*;
 public class PrisonerForm2 extends JDialog {
-    JTextField tfName,tfAge,tfAddress;
-    public JTextField tfIdCard;
+    JTextField tfName,tfAge,tfAddress,tfRelativeName,tfRelativeAge,tfRelativeAddress,tfRelativePhone,tfRelationship;
+    public JTextField tfIdCard,tfRelativeIDCard;
     JButton btnSave;
-    JComboBox boxGender,boxCity,boxCountry,boxCrime,boxPunishment,boxDanger;
+    JComboBox boxGender,boxCity,boxCountry,boxCrime,boxPunishment,boxDanger,boxRelativeCity,boxRelativeCountry;
     JDatePickerImpl dateBirthPicker,dateArrestPicker;
     JPanel pnlImg;
-    JLabel lblWarn, lblImg;
+    JLabel lblWarn;
     JLabel lblLastId;
+    CardLayout card = new CardLayout();
     public PrisonerForm2() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Prisoner Details");
@@ -132,15 +127,23 @@ public class PrisonerForm2 extends JDialog {
         tabInfo.add(splitCountry);
 
         pnlImg = new JPanel();
+        pnlImg.setLayout(card);
         pnlImg.setBounds(480,10,250,250);
         Border border = BorderFactory.createLineBorder(Color.gray);
         pnlImg.setBorder(border);
         tabInfo.add(pnlImg);
 
+
+
         JButton btnUpload = new JButton("Upload image");
         btnUpload.setBounds(530,280,150,25);
         btnUpload.addActionListener(this::uploadImg);
         tabInfo.add(btnUpload);
+
+        JButton nextCard = new JButton("Next");
+        nextCard.setBounds(710,280,60,25);
+        tabInfo.add(nextCard);
+        nextCard.addActionListener(this::nextCard);
 
         btnSave = new JButton("Save");
         btnSave.setBounds(340,450,100,25);
@@ -184,8 +187,84 @@ public class PrisonerForm2 extends JDialog {
         splitPunishment.setBounds(150,110,210,25);
         tabCrime.add(splitPunishment);
 
-
+        ///Tab Relative\
         JPanel tabRelavtive = new JPanel();
+        tabRelavtive.setLayout(null);
+        JLabel lblRelativeIDCard = new JLabel("ID Card");
+        lblRelativeIDCard.setBounds(30,30,80,25);
+        tabRelavtive.add(lblRelativeIDCard);
+
+        tfRelativeIDCard = new JTextField();
+        tfRelativeIDCard.setBounds(150,30,200,25);
+        tabRelavtive.add(tfRelativeIDCard);
+
+        JButton btnRelativeSearch = new JButton("Search");
+        btnRelativeSearch.setBounds(370,30,80,25);
+        btnRelativeSearch.addActionListener(this::searchRelative);
+        tabRelavtive.add(btnRelativeSearch);
+
+
+        JLabel lblRelativeName = new JLabel("Name");
+        lblRelativeName.setBounds(30,70,80,25);
+        tabRelavtive.add(lblRelativeName);
+
+        tfRelativeName = new JTextField();
+        tfRelativeName.setBounds(150,70,200,25);
+        tabRelavtive.add(tfRelativeName);
+
+        JLabel lblRelativeAge = new JLabel("Age");
+        lblRelativeAge.setBounds(30,110,80,25);
+        tabRelavtive.add(lblRelativeAge);
+
+        tfRelativeAge = new JTextField();
+        tfRelativeAge.setBounds(150,110,200,26);
+        tabRelavtive.add(tfRelativeAge);
+
+        JLabel lblRelativePhone = new JLabel("Phone ");
+        lblRelativePhone.setBounds(30,150,80,25);
+        tabRelavtive.add(lblRelativePhone);
+
+        tfRelativePhone = new JTextField();
+        tfRelativePhone.setBounds(150,150,200,25);
+        tabRelavtive.add(tfRelativePhone);
+
+        JLabel lblRelativeAddress = new JLabel("Address");
+        lblRelativeAddress.setBounds(30,190,80,25);
+        tabRelavtive.add(lblRelativeAddress);
+
+        tfRelativeAddress = new JTextField();
+        tfRelativeAddress.setBounds(150,190,200,25);
+        tabRelavtive.add(tfRelativeAddress);
+
+        JLabel lblRelativeCity = new JLabel("City");
+        lblRelativeCity.setBounds(30,230,80,25);
+        tabRelavtive.add(lblRelativeCity);
+
+        boxRelativeCity = new JComboBox(city);
+        boxRelativeCity.setBounds(150,230,200,25);
+        tabRelavtive.add(boxRelativeCity);
+
+        JLabel lblRelativeCountry = new JLabel("Country");
+        lblRelativeCountry.setBounds(30,270,80,25);
+        tabRelavtive.add(lblRelativeCountry);
+
+        boxRelativeCountry = new JComboBox(country);
+        boxRelativeCountry.setBounds(150,270,200,25);
+        tabRelavtive.add(boxRelativeCountry);
+
+        JLabel lblRelationship = new JLabel("Relatiobship");
+        lblRelationship.setBounds(30,310,80,25);
+        tabRelavtive.add(lblRelationship);
+
+        tfRelationship = new JTextField();
+        tfRelationship.setBounds(150,310,200,25);
+        tabRelavtive.add(tfRelationship);
+
+
+
+
+
+
         JTabbedPane tp = new JTabbedPane();
         tp.add("Information",tabInfo);
         tp.add("Crime",tabCrime);
@@ -195,9 +274,17 @@ public class PrisonerForm2 extends JDialog {
 
         setVisible(true);
     }
+    public void searchRelative(ActionEvent e){
+        RelativeSearchForm rsf = new RelativeSearchForm(this,"Relative Detail",true);
+    }
     public void searchPrisoner(ActionEvent e){
-        SearchForm sf = new SearchForm(this,"Prisoner history",true);
+        PrisonerSearchForm psf = new PrisonerSearchForm(this,"Prisoner history",true);
 
+    }
+    public void nextCard(ActionEvent e){
+        card.next(pnlImg);
+        pnlImg.validate();
+        pnlImg.repaint();
     }
     public void uploadImg (ActionEvent e){
         try
@@ -205,6 +292,7 @@ public class PrisonerForm2 extends JDialog {
             /// UI window for file chooser
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             JFileChooser fc = new JFileChooser(FileSystemView.getFileSystemView());
+            fc.setMultiSelectionEnabled(true);
             // back to UI swing
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             /// add filter for image only
@@ -212,18 +300,24 @@ public class PrisonerForm2 extends JDialog {
             fc.addChoosableFileFilter(filter);
             fc.setAcceptAllFileFilterUsed(false);
             int result = fc.showOpenDialog(getParent());
+
             if(result == JFileChooser.APPROVE_OPTION)
             {
-                File selectedFile = fc.getSelectedFile();
-                Image image = ImageIO.read(selectedFile);
-                /// scaled image
-
-                Image imageScaled = image.getScaledInstance(250,250,Image.SCALE_SMOOTH);
                 pnlImg.removeAll();
-                pnlImg.setBorder(null);
-                pnlImg.add(new JLabel(new ImageIcon(imageScaled)));
-                pnlImg.validate();
-                pnlImg.repaint();
+                //create array
+                File [] selectedFiles = fc.getSelectedFiles();
+                JLabel[] labels = new JLabel[selectedFiles.length];
+                for ( int i = 0 ; i< selectedFiles.length;i++) {
+                    Image image = ImageIO.read(selectedFiles[i]);
+                    /// scaled image
+                    Image imageScaled = image.getScaledInstance(250, 250, Image.SCALE_SMOOTH);
+                    pnlImg.setBorder(null);
+                    labels[i] = new JLabel();
+                    labels[i].setIcon(new ImageIcon(imageScaled));
+                    pnlImg.add(labels[i]);
+                    pnlImg.validate();
+                    pnlImg.repaint();
+                }
             }
 
         }catch (Exception ex)

@@ -5,8 +5,8 @@ import utils.DBConnection;
 import javax.swing.*;
 import java.awt.*;
 
-public class SearchForm extends JDialog {
-    public SearchForm(PrisonerForm2 owner, String title, boolean modal) {
+public class PrisonerSearchForm extends JDialog {
+    public PrisonerSearchForm(PrisonerForm2 owner, String title, boolean modal) {
         super(owner, title, modal);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
