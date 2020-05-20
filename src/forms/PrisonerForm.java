@@ -187,14 +187,12 @@ public PrisonerForm() {
                 p1.setPrisonername(name);
                 p1.setPrisonerage(Integer.parseInt(age));
                 p1.setGender(gender);
-                p1.setPhone(phone);
                 p1.setAddress(address);
                 p1.setCity(db.getColumnID("city",city));
                 p1.setCountry(db.getColumnID("country",country));
                 p1.setCrime(db.getColumnID("crime",crime));
                 p1.setPunishment(db.getColumnID("punishment",punishment));
                 p1.setDateofbirth(DoB);
-                p1.setDateofarrest(DoA);
                 db.Create(p1);
                 lblWarn.setBounds(520,430,240,25);
                 lblWarn.setText("Save successfully");

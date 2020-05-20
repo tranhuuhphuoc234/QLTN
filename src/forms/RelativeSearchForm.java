@@ -4,15 +4,19 @@ import utils.DBConnection;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class RelativeSearchForm extends JDialog {
+    JTable tblRelative;
+    public String relativeIdCard;
+    JLabel lblWarn;
     public RelativeSearchForm(PrisonerForm2 owner, String title, boolean modal) {
         super(owner, title, modal);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new GridLayout(2,1));
 
         setBounds(100, 100, 1000, 300);
-        JTable tblRelative = new JTable();
+        tblRelative = new JTable();
         DBConnection db = new DBConnection();
         tblRelative.setModel(db.findRelative(owner.tfRelativeIDCard.getText()));
         JScrollPane spRelative = new JScrollPane(tblRelative);
@@ -24,8 +28,25 @@ public class RelativeSearchForm extends JDialog {
 
         JButton btnAdd = new JButton("Add");
         btnAdd.setPreferredSize(new Dimension(80,25));
+        btnAdd.addActionListener(e -> {
+            try {
+                relativeIdCard = "" + db.getColumnID("relative", (String) tblRelative.getValueAt(0, 0));
+                owner.Relative = Integer.parseInt(relativeIdCard);
+                lblWarn.setText("Add sucessfully");
+                lblWarn.setForeground(Color.green);
+                owner.btnAdd.setEnabled(false);
+            }catch (Exception ex)
+            {
+                ex.printStackTrace();
+                lblWarn.setText("Can not find relative");
+                lblWarn.setForeground(Color.red);
+
+            }
+        });
         pnl.add(btnAdd);
         add(pnl);
+        lblWarn = new JLabel();
+        pnl.add(lblWarn);
 
         setVisible(true);
     }

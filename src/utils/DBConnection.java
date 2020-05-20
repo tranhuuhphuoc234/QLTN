@@ -58,6 +58,29 @@ public class DBConnection<T> {
         }
         return false;
     }
+    public String getLocation(String tableName,String columnValue ){
+        try(Connection con = DriverManager.getConnection(urlConnection))
+        {
+            Statement stmt = con.createStatement();
+            String query = "";
+            if ( tableName.equals("country"))
+            {
+                query = "findcountrybycity N'"+columnValue+"'";
+            }
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+            {
+                return rs.getString(1);
+            }
+
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+    return null;
+    }
+
 
     public int getLastId() {
         try (Connection con = DriverManager.getConnection(urlConnection)) {
@@ -92,12 +115,19 @@ public class DBConnection<T> {
         return "";
     }
 
+
     public int getColumnID(String tableName, String columnValue) {
         try (Connection con = DriverManager.getConnection(urlConnection)) {
             Statement stmt = con.createStatement();
             String columnID = tableName + "id";
             String columnName = tableName + "name";
-            String query = "SELECT " + columnID + " FROM " + tableName + " WHERE " + columnName + " = N'" + columnValue + "'";
+            String query ="";
+            if (!tableName.equals("relative")) {
+                query = "SELECT " + columnID + " FROM " + tableName + " WHERE " + columnName + " = N'" + columnValue + "'";
+            }
+            else{
+                query ="SELECT " +columnID +" FROM " + tableName + " WHERE " + tableName+"idcard ='" +columnValue+"'";
+            }
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 return rs.getInt(1);
