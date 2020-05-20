@@ -4,13 +4,12 @@ import utils.DBConnection;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class RelativeSearchForm extends JDialog {
     JTable tblRelative;
     public String relativeIdCard;
     JLabel lblWarn;
-    public RelativeSearchForm(PrisonerForm2 owner, String title, boolean modal) {
+    public RelativeSearchForm(PrisonerForm owner, String title, boolean modal) {
         super(owner, title, modal);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new GridLayout(2,1));
