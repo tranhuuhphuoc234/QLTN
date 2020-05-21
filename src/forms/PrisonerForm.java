@@ -8,14 +8,14 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
-
 import models.entities.prisoner;
 import models.entities.prisonerhistory;
+import models.entities.relative;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
@@ -28,10 +28,9 @@ public class PrisonerForm extends JDialog {
     JComboBox boxGender, boxCity, boxCountry, boxCrime, boxPunishment, boxDanger, boxRelativeCity, boxRelativeCountry,boxCellroom;
     JDatePickerImpl dateBirthPicker, dateArrestPicker;
     JPanel pnlImg;
-    JLabel lblWarn;
-    JLabel lblLastId;
+    JLabel lblWarn,lblLastId,lblWarnRel;
     CardLayout card = new CardLayout();
-    public int Relative;
+    public int relativeId;
 
     public PrisonerForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -162,7 +161,7 @@ public class PrisonerForm extends JDialog {
         tabInfo.add(btnSave);
 
         lblWarn = new JLabel();
-        lblWarn.setBounds(300,485,300,25);
+        lblWarn.setBounds(330,485,300,25);
         tabInfo.add(lblWarn);
 
         JPanel tabCrime = new JPanel();
@@ -235,6 +234,8 @@ public class PrisonerForm extends JDialog {
         tabRelavtive.add(btnRelativeSearch);
 
 
+
+
         JLabel lblRelativeName = new JLabel("Name");
         lblRelativeName.setBounds(30, 70, 80, 25);
         tabRelavtive.add(lblRelativeName);
@@ -303,8 +304,12 @@ public class PrisonerForm extends JDialog {
 
         btnAdd = new JButton("Add");
         btnAdd.setBounds(300,380,80,25);
+        btnAdd.addActionListener(this::addRelative);
         tabRelavtive.add(btnAdd);
 
+        lblWarnRel = new JLabel();
+        lblWarnRel.setBounds(280,420,300,25);
+        tabRelavtive.add(lblWarnRel);
 
         JTabbedPane tp = new JTabbedPane();
         tp.add("Information", tabInfo);
@@ -368,7 +373,7 @@ public class PrisonerForm extends JDialog {
                 p1.setAddress(address);
                 p1.setCity(city);
                 p1.setCountry(country);
-                p1.setRelative(Relative);
+                p1.setRelative(relativeId);
 
                 ph1.setPrisoneridcard(idcard);
                 ph1.setPrisonername(name);
@@ -384,7 +389,7 @@ public class PrisonerForm extends JDialog {
                 ph1.setAddress(address);
                 ph1.setCity(city);
                 ph1.setCountry(country);
-                ph1.setRelative(Relative);
+                ph1.setRelative(relativeId);
 
                 if(db.Create(p1) && db.Create(ph1))
                 {
@@ -439,6 +444,55 @@ public class PrisonerForm extends JDialog {
         }
 
     }
+    public void addRelative(ActionEvent e)
+    {
+        try{
+            DBConnection db = new DBConnection();
+            String idcard = tfRelativeIDCard.getText();
+            String name = tfRelativeName.getText();
+            int age = Integer.parseInt(tfRelativeAge.getText());
+            String phone = tfRelativePhone.getText();
+            String address = tfRelativeAddress.getText();
+            int city = db.getColumnID("city",boxRelativeCity.getSelectedItem().toString());
+            int country = db.getColumnID("country",boxRelativeCountry.getSelectedItem().toString());
+            String relationship = tfRelationship.getText();
+            if(idcard.isEmpty()||name.isEmpty()||phone.isEmpty()||address.isEmpty()||relationship.isEmpty())
+            {
+                lblWarnRel.setText("Please enter all required information");
+                lblWarnRel.setForeground(Color.red);
+            }
+            else if (db.check("checkRelativeIdCard",idcard))
+            {
+                lblWarnRel.setText("Relative has already existed");
+                lblWarnRel.setForeground(Color.red);
+            }
+            else
+            {
+                relative r1 = new relative();
+                r1.setRelativeidcard(idcard);
+                r1.setRelativename(name);
+                r1.setRelativeage(age);
+                r1.setRelativephone(phone);
+                r1.setRelativeaddress(address);
+                r1.setCity(city);
+                r1.setCountry(country);
+                r1.setRelationship(relationship);
+                if(db.Create(r1))
+                {
+                    relativeId = db.callProc("findrelativeid",idcard);
+                    lblWarnRel.setText("Save successfully");
+                    lblWarnRel.setForeground(Color.green);
+                }
+            }
+
+        }catch (Exception ex)
+        {
+            lblWarnRel.setText("Please enter all required information");
+            lblWarnRel.setForeground(Color.red);
+            ex.printStackTrace();
+        }
+
+    }
     public Timestamp getTimeStamp(String date){
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -454,21 +508,23 @@ public class PrisonerForm extends JDialog {
         String[] part = punishment.split("\\s+");
         int intPart = Integer.parseInt(part[0]);
         long arrestTimeInMil = getTimeStamp(dateArrestPicker.getJFormattedTextField().getText()).getTime();
-        long jailTimeInMil = 0;
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(arrestTimeInMil);
         if(part[1].equals("năm"))
         {
-            jailTimeInMil = (long)intPart*365*24*60*60*1000;
+            cal.add(Calendar.YEAR,intPart);
+
         }
         else if (part[1].equals("tháng"))
         {
-            jailTimeInMil = (long)intPart*30*24*60*60*1000;
+            cal.add(Calendar.MONTH,intPart);
         }
         else
         {
-            jailTimeInMil = (long)intPart*24*60*60*1000;
+            cal.add(Calendar.DATE,intPart);
         }
 
-        long releaseTimeInMil = arrestTimeInMil+jailTimeInMil;
+        long releaseTimeInMil = cal.getTimeInMillis();
         Timestamp result = new Timestamp(releaseTimeInMil);
 
         return result;

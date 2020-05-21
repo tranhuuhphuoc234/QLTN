@@ -30,14 +30,14 @@ public class RelativeSearchForm extends JDialog {
         btnAdd.addActionListener(e -> {
             try {
                 relativeIdCard = "" + db.getColumnID("relative", (String) tblRelative.getValueAt(0, 0));
-                owner.Relative = Integer.parseInt(relativeIdCard);
+                owner.relativeId = Integer.parseInt(relativeIdCard);
                 lblWarn.setText("Add sucessfully");
                 lblWarn.setForeground(Color.green);
                 owner.btnAdd.setEnabled(false);
             }catch (Exception ex)
             {
                 ex.printStackTrace();
-                lblWarn.setText("Can not find relative");
+                lblWarn.setText("Could not find relative");
                 lblWarn.setForeground(Color.red);
 
             }

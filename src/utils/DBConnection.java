@@ -23,9 +23,13 @@ public class DBConnection<T> {
             query += ") VALUES(";
             for (Field fieldItem : fields
             ) {
-                if (!fieldItem.getType().equals(int.class))
+                if(fieldItem.getType().equals(String.class)){
+                    query += "N'" + fieldItem.get(item) + "',";
+
+                }
+                else if (!fieldItem.getType().equals(int.class))
                     query += "'" + fieldItem.get(item) + "',";
-                else {
+                 else{
                     query += fieldItem.get(item) + ",";
                 }
             }
@@ -44,19 +48,45 @@ public class DBConnection<T> {
         return false;
     }
 
-    public boolean checkUser(String userName) {
+    public boolean check(String check,String value) {
         try (Connection con = DriverManager.getConnection(urlConnection)) {
             Statement stmt = con.createStatement();
-            String query = "SELECT USERNAME FROM USERS WHERE USERNAME ='" + userName + "'";
+            String query ="";
+            if(check.equals("checkUser")) {
+                query = "SELECT USERNAME FROM USERS WHERE USERNAME ='" + value + "'";
+            }
+            if(check.equals("checkRelativeIdCard"))
+            {
+                query = "SELECT relativeidcard FROM relative WHERE relativeidcard ='"+value+"'";
+            }
             ResultSet rs = stmt.executeQuery(query);
-            if (!rs.next()) {
+            if (rs.next()) {
                 return true;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
+
+
         }
         return false;
+    }
+    public int callProc (String procName,String value)
+    {
+        try(Connection con = DriverManager.getConnection(urlConnection))
+        {
+            String query = procName+" '"+value+"'";
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next()){
+                return rs.getInt(1);
+            }
+
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return 0;
     }
     public String getLocation(String tableName,String columnValue ){
         try(Connection con = DriverManager.getConnection(urlConnection))
