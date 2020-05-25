@@ -7,12 +7,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
+
 import models.entities.prisoner;
 import models.entities.prisonerhistory;
 import models.entities.relative;
@@ -22,15 +26,15 @@ import org.jdatepicker.impl.UtilDateModel;
 import utils.*;
 
 public class PrisonerForm extends JDialog {
-    JTextField tfName, tfAge, tfAddress, tfRelativeName, tfRelativeAge, tfRelativeAddress, tfRelativePhone, tfRelationship;
+    JTextField tfName, tfAge, tfAddress, tfRelativeName, tfRelativeAge, tfRelativeAddress, tfRelativePhone, tfRelationship,tfPrisonerId;
     public JTextField tfIdCard, tfRelativeIDCard;
     JButton btnSave,btnAdd;
     JComboBox boxGender, boxCity, boxCountry, boxCrime, boxPunishment, boxDanger, boxRelativeCity, boxRelativeCountry,boxCellroom;
     JDatePickerImpl dateBirthPicker, dateArrestPicker;
     JPanel pnlImg;
     JLabel lblWarn,lblLastId,lblWarnRel;
+    File[] selectedFiles;
     CardLayout card = new CardLayout();
-    public int relativeId;
 
     public PrisonerForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -121,7 +125,7 @@ public class PrisonerForm extends JDialog {
             String columnName = db.getLocation("country", boxCity.getSelectedItem().toString());
             boxCountry.setSelectedItem(columnName);
             boxCountry.enable();
-            if (!boxCountry.getSelectedItem().equals("Select")) {
+            if (boxCity.getSelectedIndex() != 0) {
                 boxCountry.disable();
             }
         });
@@ -278,7 +282,7 @@ public class PrisonerForm extends JDialog {
             String columnName = db.getLocation("country", boxRelativeCity.getSelectedItem().toString());
             boxRelativeCountry.setSelectedItem(columnName);
             boxRelativeCountry.enable();
-            if (!boxRelativeCountry.getSelectedItem().equals("Select")) {
+            if (boxRelativeCity.getSelectedIndex() != 0) {
                 boxRelativeCountry.disable();
             }
 
@@ -302,13 +306,21 @@ public class PrisonerForm extends JDialog {
         tfRelationship.setBounds(150, 310, 200, 25);
         tabRelavtive.add(tfRelationship);
 
+        JLabel lblPrisonerId = new JLabel("Prisoner ID");
+        lblPrisonerId.setBounds(30,350,80,25);
+        tabRelavtive.add(lblPrisonerId);
+
+        tfPrisonerId = new JTextField();
+        tfPrisonerId.setBounds(150,350,200,25);
+        tabRelavtive.add(tfPrisonerId);
+
         btnAdd = new JButton("Add");
-        btnAdd.setBounds(300,380,80,25);
+        btnAdd.setBounds(300,420,80,25);
         btnAdd.addActionListener(this::addRelative);
         tabRelavtive.add(btnAdd);
 
         lblWarnRel = new JLabel();
-        lblWarnRel.setBounds(280,420,300,25);
+        lblWarnRel.setBounds(280,460,300,25);
         tabRelavtive.add(lblWarnRel);
 
         JTabbedPane tp = new JTabbedPane();
@@ -327,7 +339,6 @@ public class PrisonerForm extends JDialog {
 
     public void searchPrisoner(ActionEvent e) {
         PrisonerSearchForm psf = new PrisonerSearchForm(this, "Prisoner history", true);
-
     }
     public void nextCard(ActionEvent e) {
         card.next(pnlImg);
@@ -373,7 +384,6 @@ public class PrisonerForm extends JDialog {
                 p1.setAddress(address);
                 p1.setCity(city);
                 p1.setCountry(country);
-                p1.setRelative(relativeId);
 
                 ph1.setPrisoneridcard(idcard);
                 ph1.setPrisonername(name);
@@ -389,10 +399,31 @@ public class PrisonerForm extends JDialog {
                 ph1.setAddress(address);
                 ph1.setCity(city);
                 ph1.setCountry(country);
-                ph1.setRelative(relativeId);
 
                 if(db.Create(p1) && db.Create(ph1))
                 {
+                    for(int i = 0; i<selectedFiles.length;i++)
+                    {
+                        File dir = new File("src\\images\\"+tfIdCard.getText());
+                        dir.mkdir();
+                        File file = new File(selectedFiles[i].getAbsolutePath());
+                        file.renameTo(new File("src\\images\\"+tfIdCard.getText()+"\\"+i+".jpg"));
+                    }
+
+                    tfIdCard.setText(null);
+                    tfName.setText(null);
+                    tfAge.setText(null);
+                    boxGender.setSelectedIndex(0);
+                    dateBirthPicker.getModel().setValue(null);
+                    dateArrestPicker.getModel().setValue(null);
+                    boxCrime.setSelectedIndex(0);
+                    boxDanger.setSelectedIndex(0);
+                    boxPunishment.setSelectedIndex(0);
+                    boxCellroom.setSelectedIndex(0);
+                    tfAddress.setText(null);
+                    boxCity.setSelectedIndex(0);
+                    boxCountry.setSelectedIndex(0);
+                    pnlImg.removeAll();
                     lblWarn.setText("Save successfully");
                     lblWarn.setForeground(Color.green);
                 }
@@ -424,7 +455,7 @@ public class PrisonerForm extends JDialog {
             if (result == JFileChooser.APPROVE_OPTION) {
                 pnlImg.removeAll();
                 //create array
-                File[] selectedFiles = fc.getSelectedFiles();
+                selectedFiles = fc.getSelectedFiles();
                 JLabel[] labels = new JLabel[selectedFiles.length];
                 for (int i = 0; i < selectedFiles.length; i++) {
                     Image image = ImageIO.read(selectedFiles[i]);
@@ -456,10 +487,17 @@ public class PrisonerForm extends JDialog {
             int city = db.getColumnID("city",boxRelativeCity.getSelectedItem().toString());
             int country = db.getColumnID("country",boxRelativeCountry.getSelectedItem().toString());
             String relationship = tfRelationship.getText();
-            if(idcard.isEmpty()||name.isEmpty()||phone.isEmpty()||address.isEmpty()||relationship.isEmpty())
+            int prisonerid = Integer.parseInt(tfPrisonerId.getText().toString());
+            if(idcard.isEmpty()||name.isEmpty()||phone.isEmpty()||address.isEmpty()||relationship.isEmpty()||prisonerid == 0)
             {
                 lblWarnRel.setText("Please enter all required information");
                 lblWarnRel.setForeground(Color.red);
+            }
+            else if(db.check("checkPrisonerId",String.valueOf(prisonerid))){
+
+                lblWarnRel.setText("Could not find prisoner");
+                lblWarnRel.setForeground(Color.red);
+
             }
             else if (db.check("checkRelativeIdCard",idcard))
             {
@@ -477,9 +515,9 @@ public class PrisonerForm extends JDialog {
                 r1.setCity(city);
                 r1.setCountry(country);
                 r1.setRelationship(relationship);
-                if(db.Create(r1))
+                if(db.Create(r1)&& (db.updatePrisoner(String.valueOf(prisonerid),String.valueOf(db.callProc("findrelativeid",idcard)))))
                 {
-                    relativeId = db.callProc("findrelativeid",idcard);
+
                     lblWarnRel.setText("Save successfully");
                     lblWarnRel.setForeground(Color.green);
                 }
@@ -530,3 +568,5 @@ public class PrisonerForm extends JDialog {
         return result;
     }
 }
+
+

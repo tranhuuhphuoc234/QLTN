@@ -23,18 +23,21 @@ public class DBConnection<T> {
             query += ") VALUES(";
             for (Field fieldItem : fields
             ) {
-                if(fieldItem.getType().equals(String.class)){
+                if (fieldItem.getType().equals(String.class)) {
                     query += "N'" + fieldItem.get(item) + "',";
 
-                }
-                else if (!fieldItem.getType().equals(int.class))
+                } else if (fieldItem.getType().equals(Timestamp.class)) {
                     query += "'" + fieldItem.get(item) + "',";
-                 else{
+                } else if (fieldItem.getType().equals(int.class)) {
                     query += fieldItem.get(item) + ",";
+                } else {
+                    query += "convert(VARBINARY(max),'" + fieldItem.get(item) + "'),";
                 }
+
             }
             query = query.substring(0, query.length() - 1);
             query += ")";
+            System.out.println(query);
             PreparedStatement pstmt = con.prepareStatement(query);
             int check = pstmt.executeUpdate();
             if (check == 1) {
@@ -48,16 +51,19 @@ public class DBConnection<T> {
         return false;
     }
 
-    public boolean check(String check,String value) {
+    public boolean check(String check, String value) {
         try (Connection con = DriverManager.getConnection(urlConnection)) {
             Statement stmt = con.createStatement();
-            String query ="";
-            if(check.equals("checkUser")) {
+            String query = "";
+            if (check.equals("checkUser")) {
                 query = "SELECT USERNAME FROM USERS WHERE USERNAME ='" + value + "'";
             }
-            if(check.equals("checkRelativeIdCard"))
+            else if (check.equals("checkRelativeIdCard")) {
+                query = "SELECT relativeidcard FROM relative WHERE relativeidcard ='" + value + "'";
+            }
+            else if (check.equals("checkPrisonerId"))
             {
-                query = "SELECT relativeidcard FROM relative WHERE relativeidcard ='"+value+"'";
+                query ="checkprisonerid "+value;
             }
             ResultSet rs = stmt.executeQuery(query);
             if (rs.next()) {
@@ -71,23 +77,22 @@ public class DBConnection<T> {
         }
         return false;
     }
-    public int callProc (String procName,String value)
-    {
-        try(Connection con = DriverManager.getConnection(urlConnection))
-        {
-            String query = procName+" '"+value+"'";
+
+    public int callProc(String procName, String value) {
+        try (Connection con = DriverManager.getConnection(urlConnection)) {
+            String query = procName + " '" + value + "'";
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getInt(1);
             }
 
-        }catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
+
     public String getLocation(String tableName,String columnValue ){
         try(Connection con = DriverManager.getConnection(urlConnection))
         {
@@ -166,6 +171,22 @@ public class DBConnection<T> {
             e.printStackTrace();
         }
         return 0;
+    }
+    public boolean updatePrisoner(String priosnerId, String relativeid){
+        try(Connection con = DriverManager.getConnection(urlConnection); Statement stmt = con.createStatement())
+        {
+            String query = "updateprisoner"+ priosnerId + ","+relativeid;
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+            {
+                return true;
+            }
+
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
     }
     public DefaultTableModel findRelative(String idCard) {
         try (Connection con = DriverManager.getConnection(urlConnection); Statement stmt = con.createStatement()) {
