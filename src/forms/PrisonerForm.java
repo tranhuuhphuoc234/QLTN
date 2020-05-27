@@ -34,6 +34,7 @@ public class PrisonerForm extends JDialog {
     JPanel pnlImg;
     JLabel lblWarn,lblLastId,lblWarnRel;
     File[] selectedFiles;
+    JLabel[] labels;
     CardLayout card = new CardLayout();
 
     public PrisonerForm() {
@@ -367,6 +368,11 @@ public class PrisonerForm extends JDialog {
                 lblWarn.setText("Please enter all required information");
                 lblWarn.setForeground(Color.red);
             }
+            else if ( labels[0].getParent() == null)
+            {
+                lblWarn.setText("Please upload images");
+                lblWarn.setForeground(Color.red);
+            }
             else{
                 prisoner p1 = new prisoner();
                 prisonerhistory ph1 = new prisonerhistory();
@@ -424,6 +430,8 @@ public class PrisonerForm extends JDialog {
                     boxCity.setSelectedIndex(0);
                     boxCountry.setSelectedIndex(0);
                     pnlImg.removeAll();
+                    pnlImg.repaint();
+                    pnlImg.revalidate();
                     lblWarn.setText("Save successfully");
                     lblWarn.setForeground(Color.green);
                 }
@@ -456,7 +464,7 @@ public class PrisonerForm extends JDialog {
                 pnlImg.removeAll();
                 //create array
                 selectedFiles = fc.getSelectedFiles();
-                JLabel[] labels = new JLabel[selectedFiles.length];
+                labels = new JLabel[selectedFiles.length];
                 for (int i = 0; i < selectedFiles.length; i++) {
                     Image image = ImageIO.read(selectedFiles[i]);
                     /// scaled image
@@ -493,7 +501,8 @@ public class PrisonerForm extends JDialog {
                 lblWarnRel.setText("Please enter all required information");
                 lblWarnRel.setForeground(Color.red);
             }
-            else if(db.check("checkPrisonerId",String.valueOf(prisonerid))){
+
+            else if(!db.check("checkPrisonerId",String.valueOf(prisonerid))){
 
                 lblWarnRel.setText("Could not find prisoner");
                 lblWarnRel.setForeground(Color.red);
@@ -515,11 +524,14 @@ public class PrisonerForm extends JDialog {
                 r1.setCity(city);
                 r1.setCountry(country);
                 r1.setRelationship(relationship);
-                if(db.Create(r1)&& (db.updatePrisoner(String.valueOf(prisonerid),String.valueOf(db.callProc("findrelativeid",idcard)))))
+                r1.setPrisonerid(prisonerid);
+                if(db.Create(r1))
                 {
-
-                    lblWarnRel.setText("Save successfully");
-                    lblWarnRel.setForeground(Color.green);
+                    if(db.updatePrisoner(String.valueOf(prisonerid),String.valueOf(db.callProc("findrelativeid",idcard))))
+                    {
+                        lblWarnRel.setText("Save successfully");
+                        lblWarnRel.setForeground(Color.green);
+                    }
                 }
             }
 

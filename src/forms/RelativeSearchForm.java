@@ -29,8 +29,14 @@ public class RelativeSearchForm extends JDialog {
         btnAdd.setPreferredSize(new Dimension(80,25));
         btnAdd.addActionListener(e -> {
             try {
-                String relativeid = tblRelative.getValueAt(0,0).toString();
-                if(db.updatePrisoner(owner.tfPrisonerId.getText(),relativeid)) {
+                String relativeidcard = tblRelative.getValueAt(0,0).toString();
+                String relativeid = String.valueOf(db.callProc("findrelativeid",relativeidcard));
+                if(owner.tfPrisonerId.getText().isEmpty()||!db.check("checkPrisonerId",String.valueOf(owner.tfPrisonerId.getText())))
+                {
+                    lblWarn.setText("Could not find prisoner");
+                    lblWarn.setForeground(Color.red);
+                }
+                else if(db.updatePrisoner(owner.tfPrisonerId.getText(),relativeid)) {
                     lblWarn.setText("Add sucessfully");
                     lblWarn.setForeground(Color.green);
                 }

@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public class prisoner {
     public String prisoneridcard,prisonername,gender,address;
-    public int prisonerage,crime,dangerlevel,punishment,cellroom,city,relative,country;
+    public int prisonerage,crime,dangerlevel,punishment,cellroom,city,country;
     public Timestamp dateofbirth, dateofarrest,dateofrelease;
 
     public Timestamp getDateofrelease() {
@@ -93,14 +93,6 @@ public class prisoner {
 
     public void setCity(int city) {
         this.city = city;
-    }
-
-    public int getRelative() {
-        return relative;
-    }
-
-    public void setRelative(int relative) {
-        this.relative = relative;
     }
 
     public int getCountry() {

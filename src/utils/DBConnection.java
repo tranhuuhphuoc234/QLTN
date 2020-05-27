@@ -149,6 +149,69 @@ public class DBConnection<T> {
         }
         return "";
     }
+    public DefaultTableModel getRelative(String name, String value){
+        try (Connection con = DriverManager.getConnection(urlConnection))
+        {
+            String query = "";
+            Statement stmt = con.createStatement();
+            if( name.equals("All")||name.equals("Select")) {
+                query = "select relativeidcard, relativename,relativeage,relativephone,relativeaddress,cityname,countryname,relationship,prisonerid from relative join city on relative.city = cityid join country on relative.country = countryid";
+            }
+            if(name.equals("ID Card"))
+            {
+                query = "select relativeidcard, relativename,relativeage,relativephone,relativeaddress,cityname,countryname,relationship,prisonerid " +
+                        "from relative join city on relative.city = cityid join country on relative.country = countryid " +
+                        "WHERE relativeidcard ='"+value+"'";
+            }
+            if(name.equals("Prisoner ID"))
+            {
+                query = "select relativeidcard, relativename,relativeage,relativephone,relativeaddress,cityname,countryname,relationship,prisonerid " +
+                        "from relative join city on relative.city = cityid join country on relative.country = countryid " +
+                        "WHERE prisonerid='"+value+"'";
+            }
+            if(name.equals("Name"))
+            {
+                query = "select relativeidcard, relativename,relativeage,relativephone,relativeaddress,cityname,countryname,relationship,prisonerid " +
+                        "from relative join city on relative.city = cityid join country on relative.country = countryid " +
+                        "WHERE relativename like N'%"+value+"%'";
+            }
+            DefaultTableModel model = new DefaultTableModel() {
+                public boolean isCellEditable(int row, int col)/// lam bang k chinh sua dc
+                {
+                    return false;
+                }
+            };
+            model.addColumn("ID Card");
+            model.addColumn("Name");
+            model.addColumn("Age");
+            model.addColumn("Phone");
+            model.addColumn("Address");
+            model.addColumn("City");
+            model.addColumn("Country");
+            model.addColumn("Relationship");
+            model.addColumn("Prisoner ID");
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+            {
+                String idcard = rs.getString("relativeidcard");
+                String relativenamename = rs.getString("relativename");
+                int age = rs.getInt("relativeage");
+                String phone = rs.getString("relativephone");
+                String address = rs.getString("relativeaddress");
+                String city = rs.getString("cityname");
+                String country = rs.getString("countryname");
+                String relationship = rs.getString("relationship");
+                int prisonerid = rs.getInt("prisonerid");
+                model.addRow(new Object[]{idcard,relativenamename,age,phone,address,city,country,relationship,prisonerid});
+            }
+            return model;
+        }catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
 
     public int getColumnID(String tableName, String columnValue) {
@@ -173,11 +236,14 @@ public class DBConnection<T> {
         return 0;
     }
     public boolean updatePrisoner(String priosnerId, String relativeid){
-        try(Connection con = DriverManager.getConnection(urlConnection); Statement stmt = con.createStatement())
+        int check ;
+        try(Connection con = DriverManager.getConnection(urlConnection))
         {
-            String query = "updateprisoner"+ priosnerId + ","+relativeid;
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next())
+            String query = "updateprisoner "+ priosnerId + ","+relativeid;
+            System.out.println(query);
+            PreparedStatement pstmt = con.prepareStatement(query);
+            check = pstmt.executeUpdate();
+            if (check != 0)
             {
                 return true;
             }
@@ -206,6 +272,7 @@ public class DBConnection<T> {
             model.addColumn("City");
             model.addColumn("Country");
             model.addColumn("Relationship");
+            model.addColumn("Prisoner ID");
             while (rs.next()){
                 String id = rs.getString("relativeidcard");
                 String name = rs.getString("relativename");
@@ -215,9 +282,9 @@ public class DBConnection<T> {
                 String city = rs.getString("cityname");
                 String country = rs.getString("countryname");
                 String relationship = rs.getString("relationship");
-                model.addRow(new Object[]{id,name,age,phone,address,city,country,relationship});
+                Integer prisonerid = rs.getInt("prisonerid");
+                model.addRow(new Object[]{id,name,age,phone,address,city,country,relationship,prisonerid});
             }
-            System.out.println(query);
             return model;
 
         } catch (SQLException e) {

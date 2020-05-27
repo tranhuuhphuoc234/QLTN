@@ -2,7 +2,15 @@ package models.entities;
 
 public class relative {
     public String relativeidcard,relativename,relativephone,relativeaddress,relationship;
-    public int relativeage,city,country;
+    public int relativeage,city,country,prisonerid;
+
+    public int getPrisonerid() {
+        return prisonerid;
+    }
+
+    public void setPrisonerid(int prisonerid) {
+        this.prisonerid = prisonerid;
+    }
 
     public String getRelativeidcard() {
         return relativeidcard;
