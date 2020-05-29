@@ -5,17 +5,18 @@ import utils.DBConnection;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class EditMainForm extends JFrame {
     JTextField tfSearchRelative;
     JComboBox  boxRelativeSelect;
-    public static JTable tableRelative;
+    public static JTable tableRelative,tablePrisoner;
     public EditMainForm(String title) throws HeadlessException {
         super(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setBounds(100,100,1200,600);
+        setBounds(100,100,1400,600);
         DBConnection db = new DBConnection();
 
         JTabbedPane tp = new JTabbedPane();
@@ -59,7 +60,182 @@ public class EditMainForm extends JFrame {
 
         relative.add(pnlResultRelative,BorderLayout.SOUTH);
 
+        prisoner.setLayout(new BorderLayout());
+        JPanel pnlSearchPrisoner = new JPanel();
+        pnlSearchPrisoner.setLayout(null);
+        pnlSearchPrisoner.setPreferredSize(new Dimension(1,250));
+        pnlSearchPrisoner.setBorder(line);
 
+        JLabel lblPrisonerId = new JLabel("Prisoner ID");
+        lblPrisonerId.setBounds(30,30,80,25);
+        pnlSearchPrisoner.add(lblPrisonerId);
+
+        JTextField tfPrisonerId = new JTextField();
+        tfPrisonerId.setBounds(100,30,200,25);
+        pnlSearchPrisoner.add(tfPrisonerId);
+
+        JLabel lblPrisonerIdCard = new JLabel("ID Card");
+        lblPrisonerIdCard.setBounds(30,70,80,25);
+        pnlSearchPrisoner.add(lblPrisonerIdCard);
+
+        JTextField tfPrisonerIdCard = new JTextField();
+        tfPrisonerIdCard.setBounds(100,70,200,25);
+        pnlSearchPrisoner.add(tfPrisonerIdCard);
+
+        JLabel lblPrisonerName = new JLabel("Name");
+        lblPrisonerName.setBounds(30,110,80,25);
+        pnlSearchPrisoner.add(lblPrisonerName);
+
+        JTextField tfPrisonerName = new JTextField();
+        tfPrisonerName.setBounds(100,110,200,25);
+        pnlSearchPrisoner.add(tfPrisonerName);
+
+        JLabel lblGender = new JLabel("Gender");
+        lblGender.setBounds(30,150,80,25);
+        pnlSearchPrisoner.add(lblGender);
+
+        String[] stringGender = {"Select","Male","Female"};
+        JComboBox boxGender = new JComboBox(stringGender);
+        boxGender.setBounds(100,150,200,25);
+        pnlSearchPrisoner.add(boxGender);
+
+        String[] intDanger ={"Danger level","1","2","3","4","5","6","7","8","9","10"};
+        JComboBox boxDanger = new JComboBox(intDanger);
+        boxDanger.setBounds(400,30,200,25);
+        pnlSearchPrisoner.add(boxDanger);
+
+        JButton btnFind = new JButton("Find");
+        btnFind.setBounds(475,180,120,25);
+
+        String stringCrime = "Crime," + db.getAllName("crime");
+        String[] crime = stringCrime.split(",");
+        JComboBox boxCrime = new JComboBox(crime);
+        boxCrime.setBounds(400, 70, 200, 25);
+        pnlSearchPrisoner.add(boxCrime);
+
+
+        String stringPunishment = "Punishment," + db.getAllName("punishment");
+        String[] punishment = stringPunishment.split(",");
+        JComboBox boxPunishment = new JComboBox(punishment);
+        boxPunishment.setBounds(400, 110, 200, 25);
+        pnlSearchPrisoner.add(boxPunishment);
+
+        String stringCellroom = "Cellroom,"+db.getAllName("cellroom");
+        String[] cellroom = stringCellroom.split(",");
+        JComboBox boxCellroom = new JComboBox(cellroom);
+        boxCellroom.setBounds(700,30,200,25);
+        pnlSearchPrisoner.add(boxCellroom);
+
+        String stringCity = "City," + db.getAllName("city");
+        String[] city = stringCity.split(",");
+        JComboBox boxCity = new JComboBox(city);
+        boxCity.setBounds(700, 70, 200, 25);
+        pnlSearchPrisoner.add(boxCity);
+
+        String stringCountry = "Country," + db.getAllName("country");
+        String[] country = stringCountry.split(",");
+        JComboBox boxCountry = new JComboBox(country);
+        boxCountry.setBounds(700, 110, 200, 25);
+        pnlSearchPrisoner.add(boxCountry);
+
+        prisoner.add(pnlSearchPrisoner,BorderLayout.NORTH);
+
+        JPanel pnlResultPrisoner = new JPanel();
+        pnlResultPrisoner.setPreferredSize(new Dimension(1,275));
+        pnlResultPrisoner.setLayout(new BorderLayout());
+        pnlResultPrisoner.setBorder(line);
+
+        btnFind.addActionListener(e -> {
+            String id = tfPrisonerId.getText();
+            String idcard = tfPrisonerIdCard.getText() ;
+            String name =tfPrisonerName.getText();
+            String gender = boxGender.getSelectedItem().toString();
+            String danger = boxDanger.getSelectedItem().toString();
+            String crimeSelected = boxCrime.getSelectedItem().toString();
+            String punishmentSelected = boxPunishment.getSelectedItem().toString();
+            String cellroomSelected = boxCellroom.getSelectedItem().toString();
+            String citySelected = boxCity.getSelectedItem().toString();
+            String countrySelected = boxCountry.getSelectedItem().toString();
+            String query = "select prisonerid,prisoneridcard,prisonername,prisonerage,gender,convert(nvarchar,dateofbirth,103) as dateofbirth,convert(nvarchar,dateofarrest,103) as dateofarrest,convert(nvarchar,dateofrelease,103) as dateofrelease,crimename,dangerlevel,punishmentname,cellroomname,cityname,countryname\n" +
+                    "from prisoner join crime on crime= crimeid\n" +
+                    "join punishment on punishment = punishmentid\n" +
+                    "join cellroom on cellroom = cellroomid\n" +
+                    "join city on city = cityid\n"+
+                    "join country on prisoner.country = countryid\n"+
+                    "where ";
+            String result ="";
+            if (!id.isEmpty())
+            {
+                query+= " prisonerid = "+id+" AND";
+            }
+            if (!idcard.isEmpty())
+            {
+                query+= " prisoneridcard = '"+idcard+"' AND";
+            }
+            if (!name.isEmpty())
+            {
+                query+= " prisonername = N'"+name+"' AND";
+            }
+            if(!gender.equals("Select"))
+            {
+                query+= " gender = N'"+gender+"' AND";
+            }
+            if(!danger.equals("Danger level"))
+            {
+                query+= " dangerlevel = "+danger+" AND";
+            }
+            if(!crimeSelected.equals("Crime"))
+            {
+                query+=" crimename = N'"+crimeSelected+"' AND";
+            }
+            if(!punishmentSelected.equals("Punishment"))
+            {
+                query+=" punishmentname = N'"+punishmentSelected+"' AND";
+            }
+            if(!cellroomSelected.equals("Cellroom")){
+                query+=" cellroomname = N'"+cellroomSelected+"' AND" ;
+            }
+            if(!citySelected.equals("City"))
+            {
+                query+=" cityname = N'"+citySelected+"' AND";
+            }
+            if(!countrySelected.equals("Country"))
+            {
+                query+=" countryname = N'"+countrySelected+"' AND";
+            }
+            if (query.substring(query.length()-6).equals("where "))
+            {
+                result = query.substring(0,query.length()-6);
+            }
+            else {
+                result = query.substring(0, query.length() - 3);
+            }
+            tablePrisoner.setModel(db.findPrisoner("",result));
+
+        });
+        pnlSearchPrisoner.add(btnFind);
+
+         tablePrisoner = new JTable(){
+            // show tooltip
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                if (c instanceof JComponent) {
+
+
+
+                        JComponent jc = (JComponent) c;
+                        jc.setToolTipText(getValueAt(row, column).toString());
+
+                }
+                return c;
+            }
+        };
+        tablePrisoner.setModel(db.findPrisoner("All",""));
+        tablePrisoner.addMouseListener(new PopClickListener());
+        JScrollPane spPrisoner = new JScrollPane(tablePrisoner);
+        pnlResultPrisoner.add(spPrisoner,BorderLayout.NORTH);
+
+        prisoner.add(pnlResultPrisoner,BorderLayout.SOUTH);
         tp.add("Prisoner",prisoner);
         tp.add("Relative",relative);
         add(tp);

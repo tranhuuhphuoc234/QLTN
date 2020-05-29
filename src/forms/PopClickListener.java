@@ -3,8 +3,6 @@ package forms;
 import utils.DBConnection;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -24,23 +22,13 @@ public class PopClickListener extends MouseAdapter {
             return;
         if(e.isPopupTrigger()  && e.getComponent() instanceof JTable)
         {
-            JPopupMenu popupMenu = new JPopupMenu();
-            JMenuItem item = new JMenuItem("Edit");
-            item.addActionListener(e1 -> {
-                relativeid = EditMainForm.tableRelative.getValueAt(EditMainForm.tableRelative.getSelectedRow(),0).toString();
-                EditRelativeForm erf = new EditRelativeForm();
+            if ( ((JTable) e.getComponent()).getColumnCount() == 9) {
+                relativeEdit(e);
+            }
+            else {
+                prisonerEdit(e);
+            }
 
-            });
-            popupMenu.add(item);
-            JMenuItem removeItem = new JMenuItem("Remove");
-            removeItem.addActionListener(e1 -> {
-                DBConnection db = new DBConnection();
-                db.callProc("deleterelative",EditMainForm.tableRelative.getValueAt(EditMainForm.tableRelative.getSelectedRow(),0).toString());
-                EditMainForm.tableRelative.setModel(db.getRelative("All",""));
-
-            });
-            popupMenu.add(removeItem);
-            popupMenu.show(e.getComponent(),e.getX(),e.getY());
         }
     }
     public void mousePressed(MouseEvent e){
@@ -54,24 +42,58 @@ public class PopClickListener extends MouseAdapter {
         int rowindex = EditMainForm.tableRelative.getSelectedRow();
         if(rowindex < 0 )
             return;
-        if(e.isPopupTrigger()  && e.getComponent() instanceof JTable)
-        {
-            JPopupMenu popupMenu = new JPopupMenu();
-            JMenuItem editItem = new JMenuItem("Edit");
-            editItem.addActionListener(e1 -> {
-                relativeid = EditMainForm.tableRelative.getValueAt(EditMainForm.tableRelative.getSelectedRow(),0).toString();
-                EditRelativeForm erf = new EditRelativeForm();
+        if(e.isPopupTrigger()  && e.getComponent() instanceof JTable) {
+            if (((JTable) e.getComponent()).getColumnCount() == 9) {
+                relativeEdit(e);
+            }
+            else
+            {
+                prisonerEdit(e);
+            }
 
-            });
-            popupMenu.add(editItem);
-            JMenuItem removeItem = new JMenuItem("Remove");
-            removeItem.addActionListener(e1 -> {
-                DBConnection db = new DBConnection();
-                db.callProc("deleterelative",EditMainForm.tableRelative.getValueAt(EditMainForm.tableRelative.getSelectedRow(),0).toString());
-                EditMainForm.tableRelative.setModel(db.getRelative("All",""));
-
-            });
-            popupMenu.add(removeItem);
-            popupMenu.show(e.getComponent(),e.getX(),e.getY());
         }
-    }}
+    }
+    public void relativeEdit(MouseEvent e){
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem editItem = new JMenuItem("Edit relative");
+        editItem.addActionListener(e1 -> {
+            relativeid = EditMainForm.tableRelative.getValueAt(EditMainForm.tableRelative.getSelectedRow(),0).toString();
+            EditRelativeForm erf = new EditRelativeForm();
+
+        });
+        popupMenu.add(editItem);
+        JMenuItem removeItem = new JMenuItem("Remove relative");
+        removeItem.addActionListener(e1 -> {
+            WarningRelativeForm wrf = new WarningRelativeForm();
+        });
+        popupMenu.add(removeItem);
+        popupMenu.show(e.getComponent(),e.getX(),e.getY());
+    }
+    public void prisonerEdit(MouseEvent e)
+    {
+        JPopupMenu popupMenu = new JPopupMenu();
+
+        JMenuItem editItem = new JMenuItem("Edit prisoner");
+        editItem.addActionListener(e1 -> {
+            EditPrisonerForm epf = new EditPrisonerForm();
+        });
+        popupMenu.add(editItem);
+
+        JMenuItem historyItem = new JMenuItem("History prisoner");
+        historyItem.addActionListener(e1 -> {
+            PrisonerHistoryForm phf = new PrisonerHistoryForm();
+        });
+        popupMenu.add(historyItem);
+
+        JMenuItem removeItem = new JMenuItem("Remove prisoner");
+        removeItem.addActionListener(e1 -> {
+            WarningPrisonerForm wf = new WarningPrisonerForm();
+
+        });
+        popupMenu.add(removeItem);
+
+
+
+        popupMenu.show(e.getComponent(),e.getX(),e.getY());
+    }
+}

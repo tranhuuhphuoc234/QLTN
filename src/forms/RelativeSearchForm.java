@@ -36,7 +36,7 @@ public class RelativeSearchForm extends JDialog {
                     lblWarn.setText("Could not find prisoner");
                     lblWarn.setForeground(Color.red);
                 }
-                else if(db.updatePrisoner(owner.tfPrisonerId.getText(),relativeid)) {
+                else if(db.updateRelativePrisoner(owner.tfPrisonerId.getText(),relativeid)) {
                     lblWarn.setText("Add sucessfully");
                     lblWarn.setForeground(Color.green);
                 }

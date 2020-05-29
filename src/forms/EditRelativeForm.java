@@ -5,21 +5,23 @@ import utils.DBConnection;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class EditRelativeForm extends JDialog {
     JComboBox boxCity,boxCountry;
+    DBConnection db = new DBConnection();
+    DefaultTableModel tbl = db.findRelative(PopClickListener.relativeid);
+    String idCard = tbl.getValueAt(0,0).toString();
+    String name = tbl.getValueAt(0,1).toString();
+    String age = tbl.getValueAt(0,2).toString();
+    String phone = tbl.getValueAt(0,3).toString();
+    String address = tbl.getValueAt(0,4).toString();
+    String cityRel = tbl.getValueAt(0,5).toString();
+    String countryRel = tbl.getValueAt(0,6).toString();
+    String relationship = tbl.getValueAt(0,7).toString();
+    String prisonerid = tbl.getValueAt(0,8).toString();
     public EditRelativeForm() {
-        DBConnection db = new DBConnection();
-        DefaultTableModel tbl = db.findRelative(PopClickListener.relativeid);
-        String idCard = tbl.getValueAt(0,0).toString();
-        String name = tbl.getValueAt(0,1).toString();
-        String age = tbl.getValueAt(0,2).toString();
-        String phone = tbl.getValueAt(0,3).toString();
-        String address = tbl.getValueAt(0,4).toString();
-        String cityRel = tbl.getValueAt(0,5).toString();
-        String countryRel = tbl.getValueAt(0,6).toString();
-        String relationship = tbl.getValueAt(0,7).toString();
-        String prisonerid = tbl.getValueAt(0,8).toString();
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Edit");
@@ -128,7 +130,39 @@ public class EditRelativeForm extends JDialog {
         JButton btnSave = new JButton("Save");
         btnSave.setBounds(190,400,120,25);
         btnSave.addActionListener(e -> {
+            try{
+            phone = tfRelativePhone.getText();
+            address = tfRelativeAddress.getText();
+            cityRel = String.valueOf(db.getColumnID("city",boxCity.getSelectedItem().toString()));
+            countryRel = String.valueOf(db.getColumnID("country",boxCountry.getSelectedItem().toString()));
+            relationship = tfRelationship.getText();
+            prisonerid = tfPrisonerId.getText();
+            if ( phone.isEmpty()||address.isEmpty()||relationship.isEmpty()||prisonerid.isEmpty())
+            {
+                lblWarn.setText("Please enter all required information");
+                lblWarn.setForeground(Color.red);
+            }
+            else if (!db.check("checkPrisonerId",prisonerid))
+            {
+                lblWarn.setText("Could not find prisoner");
+                lblWarn.setForeground(Color.red);
+            }
+            else
+            {
+                if(db.editRelative(idCard,phone,address,cityRel,countryRel,relationship,prisonerid))
+                {
+                    lblWarn.setText("Save successfully");
+                    lblWarn.setForeground(Color.green);
+                    EditMainForm.tableRelative.setModel(db.getRelative("All",""));
+                }
+            }
 
+        }catch (Exception ex)
+            {
+                ex.printStackTrace();
+                lblWarn.setText("Please enter all required information");
+                lblWarn.setForeground(Color.red);
+            }
         });
         add(btnSave);
 

@@ -7,10 +7,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -171,7 +168,6 @@ public class PrisonerForm extends JDialog {
 
         JPanel tabCrime = new JPanel();
         tabCrime.setLayout(null);
-        ;
 
         JLabel lblCrime = new JLabel("Crime");
         lblCrime.setBounds(30, 30, 80, 25);
@@ -527,7 +523,7 @@ public class PrisonerForm extends JDialog {
                 r1.setPrisonerid(prisonerid);
                 if(db.Create(r1))
                 {
-                    if(db.updatePrisoner(String.valueOf(prisonerid),String.valueOf(db.callProc("findrelativeid",idcard))))
+                    if(db.updateRelativePrisoner(String.valueOf(prisonerid),String.valueOf(db.callProc("findrelativeid",idcard))))
                     {
                         lblWarnRel.setText("Save successfully");
                         lblWarnRel.setForeground(Color.green);
@@ -568,6 +564,10 @@ public class PrisonerForm extends JDialog {
         else if (part[1].equals("tháng"))
         {
             cal.add(Calendar.MONTH,intPart);
+        }
+        else if (punishment.equals("Chung Thân"))
+        {
+            cal.add(Calendar.YEAR,200);
         }
         else
         {

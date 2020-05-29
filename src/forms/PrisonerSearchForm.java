@@ -13,7 +13,7 @@ public class PrisonerSearchForm extends JDialog {
         setBounds(100,100,1200,300);
         JTable tblPrisoner = new JTable();
         DBConnection db = new DBConnection();
-        tblPrisoner.setModel(db.findPrisoner(owner.tfIdCard.getText()));
+        tblPrisoner.setModel(db.findPrisoner("idcard",owner.tfIdCard.getText()));
         JScrollPane spPrisoner = new JScrollPane(tblPrisoner);
         add(spPrisoner,BorderLayout.NORTH);
         setVisible(true);

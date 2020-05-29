@@ -77,6 +77,23 @@ public class DBConnection<T> {
         }
         return false;
     }
+    public boolean editRelative(String idcard,String phone,String address,String city, String country,String relationship,String prisonerid)
+    {
+        try(Connection con = DriverManager.getConnection(urlConnection))
+        {
+            String query = "update relative set relativephone = '"+phone+"' ,relativeaddress = '"+address+"' ,city = "+city+" ,country = "+country+" ,relationship = '"+relationship
+                    +"' ,prisonerid = "+prisonerid+" where relativeidcard = '"+idcard+"'";
+            System.out.println(query);
+            PreparedStatement pstmt = con.prepareStatement(query);
+            if (pstmt.executeUpdate()!=0)
+            {
+                return true;
+            }
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }return false;
+    }
 
     public int callProc(String procName, String value) {
         try (Connection con = DriverManager.getConnection(urlConnection)) {
@@ -235,12 +252,27 @@ public class DBConnection<T> {
         }
         return 0;
     }
-    public boolean updatePrisoner(String priosnerId, String relativeid){
+    public boolean updatePrisoner(String query)
+    {
+        try(Connection con = DriverManager.getConnection(urlConnection))
+        {
+            PreparedStatement pstmt = con.prepareStatement(query);
+            int check = pstmt.executeUpdate();
+            if(check!= 0){
+                return true;
+            }
+
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean updateRelativePrisoner(String priosnerId, String relativeid){
         int check ;
         try(Connection con = DriverManager.getConnection(urlConnection))
         {
             String query = "updateprisoner "+ priosnerId + ","+relativeid;
-            System.out.println(query);
             PreparedStatement pstmt = con.prepareStatement(query);
             check = pstmt.executeUpdate();
             if (check != 0)
@@ -294,44 +326,103 @@ public class DBConnection<T> {
 
     }
 
-    public DefaultTableModel findPrisoner(String idCard) {
+    public DefaultTableModel findPrisoner(String find,String value) {
         try (Connection con = DriverManager.getConnection(urlConnection);Statement stmt = con.createStatement();) {
-            String query = "findprisonerbyidcard '"+idCard+"'";
-            ResultSet rs = stmt.executeQuery(query);
-            DefaultTableModel model = new DefaultTableModel() {
-                public boolean isCellEditable(int row, int col)/// lam bang k chinh sua dc
-                {
-                    return false;
-                }
-            };
-            model.addColumn("Id Card");
-            model.addColumn("Name");
-            model.addColumn("Age");
-            model.addColumn("Gender");
-            model.addColumn("Date of Birth");
-            model.addColumn("Date of Arrest");
-            model.addColumn("Date of Release");
-            model.addColumn("Crime");
-            model.addColumn("Punishment");
-            model.addColumn("Danger level");
-            model.addColumn("Cell room");
-            while (rs.next()) {
-                String id = rs.getString("prisoneridcard");
-                String name = rs.getString("prisonername");
-                Integer age = rs.getInt("prisonerage");
-                String gender = rs.getString("gender");
-                String DoB = rs.getString("dateofbirth");
-                String DoA = rs.getString("dateofarrest");
-                String DoR = rs.getString("dateofrelease");
-                String crime = rs.getString("crimename");
-                String punishment = rs.getString("punishmentname");
-                Integer danger = rs.getInt("dangerlevel");
-                String cell = rs.getString("cellroomname");
-                model.addRow(new Object[]{id, name, age, gender, DoB, DoA, DoR, crime, punishment, danger,cell});
+            String query="";
+            if(find.equals("idcard"))
+            {
+                query = "findprisonerbyidcard '"+value+"'";
             }
-            System.out.println(query);
-            return model;
-
+            else if (find.equals("All"))
+            {
+                query = "select prisonerid,prisoneridcard,prisonername,prisonerage,gender,convert(nvarchar,dateofbirth,103) as dateofbirth,convert(nvarchar,dateofarrest,103) as dateofarrest,convert(nvarchar,dateofrelease,103) as dateofrelease,crimename,dangerlevel,punishmentname,cellroomname,address,cityname,countryname\n" +
+                        "from prisoner join crime on crime= crimeid\n" +
+                        "join punishment on punishment = punishmentid\n" +
+                        "join cellroom on cellroom = cellroomid\n" +
+                        "join city on city = cityid\n"+
+                        "join country on prisoner.country = countryid\n";
+            }
+            else {
+                query = value;
+            }
+            if(!find.equals("idcard")) {
+                ResultSet rs = stmt.executeQuery(query);
+                DefaultTableModel model = new DefaultTableModel() {
+                    public boolean isCellEditable(int row, int col)/// lam bang k chinh sua dc
+                    {
+                        return false;
+                    }
+                };
+                model.addColumn("Prisoner ID");
+                model.addColumn("Id Card");
+                model.addColumn("Name");
+                model.addColumn("Age");
+                model.addColumn("Gender");
+                model.addColumn("Date of Birth");
+                model.addColumn("Date of Arrest");
+                model.addColumn("Date of Release");
+                model.addColumn("Crime");
+                model.addColumn("Punishment");
+                model.addColumn("Danger level");
+                model.addColumn("Cell room");
+                model.addColumn("Address");
+                model.addColumn("City");
+                model.addColumn("Country");
+                while (rs.next()) {
+                    String id = rs.getString("prisonerid");
+                    String idcard = rs.getString("prisoneridcard");
+                    String name = rs.getString("prisonername");
+                    Integer age = rs.getInt("prisonerage");
+                    String gender = rs.getString("gender");
+                    String DoB = rs.getString("dateofbirth");
+                    String DoA = rs.getString("dateofarrest");
+                    String DoR = rs.getString("dateofrelease");
+                    String crime = rs.getString("crimename");
+                    String punishment = rs.getString("punishmentname");
+                    Integer danger = rs.getInt("dangerlevel");
+                    String cell = rs.getString("cellroomname");
+                    String address =rs.getString("address");
+                    String city = rs.getString("cityname");
+                    String country = rs.getString("countryname");
+                    model.addRow(new Object[]{id, idcard, name, age, gender, DoB, DoA, DoR, crime, punishment, danger, cell,address, city, country});
+                }
+                 return model;
+            }
+            else{
+                ResultSet rs = stmt.executeQuery(query);
+                DefaultTableModel model = new DefaultTableModel() {
+                    public boolean isCellEditable(int row, int col)/// lam bang k chinh sua dc
+                    {
+                        return false;
+                    }
+                };
+                model.addColumn("Id Card");
+                model.addColumn("Name");
+                model.addColumn("Age");
+                model.addColumn("Gender");
+                model.addColumn("Date of Birth");
+                model.addColumn("Date of Arrest");
+                model.addColumn("Date of Release");
+                model.addColumn("Crime");
+                model.addColumn("Punishment");
+                model.addColumn("Danger level");
+                model.addColumn("Cell room");
+                while (rs.next()) {
+                    String idcard = rs.getString("prisoneridcard");
+                    String name = rs.getString("prisonername");
+                    Integer age = rs.getInt("prisonerage");
+                    String gender = rs.getString("gender");
+                    String DoB = rs.getString("dateofbirth");
+                    String DoA = rs.getString("dateofarrest");
+                    String DoR = rs.getString("dateofrelease");
+                    String crime = rs.getString("crimename");
+                    String punishment = rs.getString("punishmentname");
+                    Integer danger = rs.getInt("dangerlevel");
+                    String cell = rs.getString("cellroomname");
+                    model.addRow(new Object[]{idcard, name, age, gender, DoB, DoA, DoR, crime, punishment, danger, cell});
+                }
+                return model;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
