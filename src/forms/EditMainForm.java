@@ -2,17 +2,23 @@ package forms;
 
 import utils.DBConnection;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
 
 public class EditMainForm extends JFrame {
     JTextField tfSearchRelative;
     JComboBox  boxRelativeSelect;
     public static JTable tableRelative,tablePrisoner;
+    CardLayout card = new CardLayout();
+    JLabel[] labels;
+    JPanel pnlImg;
     public EditMainForm(String title) throws HeadlessException {
         super(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -138,6 +144,18 @@ public class EditMainForm extends JFrame {
         boxCountry.setBounds(700, 110, 200, 25);
         pnlSearchPrisoner.add(boxCountry);
 
+        pnlImg = new JPanel();
+        pnlImg.setLayout(card);
+        pnlImg.setBounds(1000,25,200,200);
+        pnlImg.setBorder(line);
+        pnlSearchPrisoner.add(pnlImg);
+
+        JButton btnNext = new JButton(">");
+        btnNext.setBounds(1220,135,45,25);
+        btnNext.addActionListener(this::nextCard);
+        add(btnNext);
+
+
         prisoner.add(pnlSearchPrisoner,BorderLayout.NORTH);
 
         JPanel pnlResultPrisoner = new JPanel();
@@ -232,6 +250,28 @@ public class EditMainForm extends JFrame {
         };
         tablePrisoner.setModel(db.findPrisoner("All",""));
         tablePrisoner.addMouseListener(new PopClickListener());
+        tablePrisoner.getSelectionModel().addListSelectionListener(e -> {
+            String idcard = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(),1).toString();
+            File dir = new File("src\\images\\"+idcard);
+            labels = new JLabel[dir.listFiles().length];
+            pnlImg.removeAll();
+            for (int i = 0; i<dir.listFiles().length;i++) {
+                String path = "src\\images\\"+idcard+"\\"+i+".jpg";
+                try {
+                    Image image = ImageIO.read(new File(path));
+                    Image imageScaled = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                    pnlImg.setBorder(null);
+                    labels[i] = new JLabel();
+                    labels[i].setIcon(new ImageIcon(imageScaled));
+                    pnlImg.add(labels[i]);
+                    pnlImg.validate();
+                    pnlImg.repaint();
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
         JScrollPane spPrisoner = new JScrollPane(tablePrisoner);
         pnlResultPrisoner.add(spPrisoner,BorderLayout.NORTH);
 
@@ -248,5 +288,10 @@ public class EditMainForm extends JFrame {
         String select = boxRelativeSelect.getSelectedItem().toString();
         String value = tfSearchRelative.getText();
         tableRelative.setModel(db.getRelative(select,value));
+    }
+    public void nextCard(ActionEvent e) {
+        card.next(pnlImg);
+        pnlImg.validate();
+        pnlImg.repaint();
     }
 }

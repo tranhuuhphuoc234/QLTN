@@ -3,8 +3,17 @@ package forms;
 import models.entities.prisonerhistory;
 import utils.DBConnection;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.image.ImagingOpException;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class EditPrisonerForm extends JDialog {
     String id = EditMainForm.tablePrisoner.getValueAt(0, 0).toString();
@@ -19,9 +28,12 @@ public class EditPrisonerForm extends JDialog {
     String punishmentSelected = EditMainForm.tablePrisoner.getValueAt(0, 9).toString();
     int dangerSelected = Integer.parseInt(EditMainForm.tablePrisoner.getValueAt(0, 10).toString());
     String cellroomSelected = EditMainForm.tablePrisoner.getValueAt(0, 11).toString();
-    String address = EditMainForm.tablePrisoner.getValueAt(0,12).toString();
-    String city = EditMainForm.tablePrisoner.getValueAt(0,13).toString();
-    String country = EditMainForm.tablePrisoner.getValueAt(0,14).toString();
+    String address = EditMainForm.tablePrisoner.getValueAt(0, 12).toString();
+    String city = EditMainForm.tablePrisoner.getValueAt(0, 13).toString();
+    String country = EditMainForm.tablePrisoner.getValueAt(0, 14).toString();
+    CardLayout card = new CardLayout();
+    JLabel[] labels;
+    JPanel pnlImg;
 
     public EditPrisonerForm() {
         setModal(true);
@@ -146,6 +158,38 @@ public class EditPrisonerForm extends JDialog {
         boxCellroom.setBounds(200, 470, 200, 25);
         add(boxCellroom);
 
+        pnlImg = new JPanel();
+        pnlImg.setLayout(card);
+        pnlImg.setBounds(350, 30, 200, 200);
+        add(pnlImg);
+
+        JButton btnNext = new JButton("");
+        btnNext.setBounds(560,120,20,20);
+        btnNext.addActionListener(e -> {
+            card.next(pnlImg);
+            pnlImg.revalidate();
+            pnlImg.repaint();
+        });
+        add(btnNext);
+
+        File dir = new File("src\\images\\" + idCard);
+        labels = new JLabel[dir.listFiles().length];
+        for (int i = 0; i < dir.listFiles().length; i++) {
+            String path = "src\\images\\" + idCard + "\\" + i + ".jpg";
+            try {
+                Image image = ImageIO.read(new File(path));
+                Image imageScaled = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                labels[i] = new JLabel();
+                labels[i].setIcon(new ImageIcon(imageScaled));
+                pnlImg.add(labels[i]);
+                pnlImg.validate();
+                pnlImg.repaint();
+            } catch (IOException io) {
+                io.printStackTrace();
+            }
+        }
+
+
         JLabel lblWarn = new JLabel();
         lblWarn.setBounds(165, 570, 300, 25);
         add(lblWarn);
@@ -159,8 +203,7 @@ public class EditPrisonerForm extends JDialog {
             if (crimeSelected.equals(boxCrime.getSelectedItem().toString()) && dangerSelected == Integer.parseInt(boxDanger.getSelectedItem().toString()) && punishmentSelected.equals(boxPunishment.getSelectedItem().toString()) && cellroomSelected.equals(boxCellroom.getSelectedItem().toString())) {
                 lblWarn.setText("Save successfully");
                 lblWarn.setForeground(Color.green);
-            }
-            else {
+            } else {
                 crimeSelected = boxCrime.getSelectedItem().toString();
                 dangerSelected = boxDanger.getSelectedIndex() + 1;
                 punishmentSelected = boxPunishment.getSelectedItem().toString();
@@ -169,30 +212,34 @@ public class EditPrisonerForm extends JDialog {
                     lblWarn.setText("Please select all required information");
                     lblWarn.setForeground(Color.red);
                 } else {
+                    Timestamp timeArrest = getTimeStamp(DoA.getText());
+                    Timestamp timeRelease = calculateRelease(punishmentSelected, timeArrest);
                     String query = "update prisoner\n" +
-                            "set crime = " + db.getColumnID("crime", crimeSelected) + ", dangerlevel = " + dangerSelected + " punishment = " + db.getColumnID("punishment", punishmentSelected) +
+                            "set crime = " + db.getColumnID("crime", crimeSelected) + ", dangerlevel = " + dangerSelected + ", punishment = " + db.getColumnID("punishment", punishmentSelected) +
                             ", cellroom = " + db.getColumnID("cellroom", cellroomSelected) +
-                            " where prisonerid = " + id;
-//                     if(db.updatePrisoner(query));
-//                    {
-//                        lblWarn.setForeground(Color.green);
-//                        lblWarn.setText("Save successfully");
-//                        prisonerhistory ph = new prisonerhistory();
-//                        ph.setPrisoneridcard(idCard);
-//                        ph.setPrisonername(name);
-//                        ph.setPrisonerage(Integer.parseInt(age));
-//                        ph.setAddress(address);
-//                        ph.setGender(gender);
-//                        ph.setCrime(db.getColumnID("crime",crimeSelected));
-//                        ph.setDangerlevel(dangerSelected);
-//                        ph.setPunishment(db.getColumnID("punishment",punishmentSelected));
-//                        ph.setCellroom(db.getColumnID("cellroom",cellroomSelected));
-//                        ph.setCity(db.getColumnID("city",city));
-//                        ph.setCountry(db.getColumnID("country",country));
-
-
-
-//                    }
+                            ", dateofrelease ='" + timeRelease +
+                            "' where prisonerid = " + id;
+                    if (db.updatePrisoner(query)) ;
+                    {
+                        lblWarn.setForeground(Color.green);
+                        lblWarn.setText("Save successfully");
+                        prisonerhistory ph = new prisonerhistory();
+                        ph.setPrisoneridcard(idCard);
+                        ph.setPrisonername(name);
+                        ph.setPrisonerage(Integer.parseInt(age));
+                        ph.setAddress(address);
+                        ph.setGender(gender);
+                        ph.setCrime(db.getColumnID("crime", crimeSelected));
+                        ph.setDangerlevel(dangerSelected);
+                        ph.setPunishment(db.getColumnID("punishment", punishmentSelected));
+                        ph.setCellroom(db.getColumnID("cellroom", cellroomSelected));
+                        ph.setCity(db.getColumnID("city", city));
+                        ph.setCountry(db.getColumnID("country", country));
+                        ph.setDateofbirth(getTimeStamp(DoB.getText()));
+                        ph.setDateofarrest(getTimeStamp(getCurrentTime()));
+                        ph.setDateofrelease(timeRelease);
+                        db.Create(ph);
+                    }
                 }
             }
         })
@@ -202,5 +249,49 @@ public class EditPrisonerForm extends JDialog {
 
         setVisible(true);
     }
+
+    public Timestamp getTimeStamp(String date) {
+        try {
+            Date initDate = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String parsedDateStr = formatter.format(initDate);
+            Date parsedDate = formatter.parse(parsedDateStr);
+            Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+            return timestamp;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Timestamp calculateRelease(String punishment, Timestamp time) {
+        String[] part = punishment.split("\\s+");
+        int intPart = Integer.parseInt(part[0]);
+        long arrestTimeInMil = time.getTime();
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(arrestTimeInMil);
+        if (part[1].equals("năm")) {
+            cal.add(Calendar.YEAR, intPart);
+
+        } else if (part[1].equals("tháng")) {
+            cal.add(Calendar.MONTH, intPart);
+        } else if (punishment.equals("Chung Thân")) {
+            cal.add(Calendar.YEAR, 200);
+        } else {
+            cal.add(Calendar.DATE, intPart);
+        }
+
+        long releaseTimeInMil = cal.getTimeInMillis();
+        Timestamp result = new Timestamp(releaseTimeInMil);
+
+        return result;
+    }
+
+    public String getCurrentTime() {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        return formatter.format(date);
+    }
+
 }
 
