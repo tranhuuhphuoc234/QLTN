@@ -5,7 +5,6 @@ import utils.DBConnection;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -153,7 +152,7 @@ public class EditMainForm extends JFrame {
         JButton btnNext = new JButton(">");
         btnNext.setBounds(1220,135,45,25);
         btnNext.addActionListener(this::nextCard);
-        add(btnNext);
+        pnlSearchPrisoner.add(btnNext);
 
 
         prisoner.add(pnlSearchPrisoner,BorderLayout.NORTH);
@@ -174,7 +173,7 @@ public class EditMainForm extends JFrame {
             String cellroomSelected = boxCellroom.getSelectedItem().toString();
             String citySelected = boxCity.getSelectedItem().toString();
             String countrySelected = boxCountry.getSelectedItem().toString();
-            String query = "select prisonerid,prisoneridcard,prisonername,prisonerage,gender,convert(nvarchar,dateofbirth,103) as dateofbirth,convert(nvarchar,dateofarrest,103) as dateofarrest,convert(nvarchar,dateofrelease,103) as dateofrelease,crimename,dangerlevel,punishmentname,cellroomname,cityname,countryname\n" +
+            String query = "select prisonerid,prisoneridcard,prisonername,prisonerage,gender,convert(nvarchar,dateofbirth,103) as dateofbirth,convert(nvarchar,dateofarrest,103) as dateofarrest,convert(nvarchar,dateofrelease,103) as dateofrelease,crimename,dangerlevel,punishmentname,cellroomname,address,cityname,countryname\n" +
                     "from prisoner join crime on crime= crimeid\n" +
                     "join punishment on punishment = punishmentid\n" +
                     "join cellroom on cellroom = cellroomid\n" +
@@ -251,7 +250,13 @@ public class EditMainForm extends JFrame {
         tablePrisoner.setModel(db.findPrisoner("All",""));
         tablePrisoner.addMouseListener(new PopClickListener());
         tablePrisoner.getSelectionModel().addListSelectionListener(e -> {
-            String idcard = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(),1).toString();
+          String idcard = "";
+            try {
+               idcard = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 1).toString();
+          } catch (Exception ex)
+          {
+              ex.printStackTrace();
+          }
             File dir = new File("src\\images\\"+idcard);
             labels = new JLabel[dir.listFiles().length];
             pnlImg.removeAll();

@@ -23,13 +23,13 @@ import org.jdatepicker.impl.UtilDateModel;
 import utils.*;
 
 public class PrisonerForm extends JDialog {
-    JTextField tfName, tfAge, tfAddress, tfRelativeName, tfRelativeAge, tfRelativeAddress, tfRelativePhone, tfRelationship,tfPrisonerId;
+    JTextField tfName, tfAge, tfAddress, tfRelativeName, tfRelativeAge, tfRelativeAddress, tfRelativePhone, tfRelationship, tfPrisonerId;
     public JTextField tfIdCard, tfRelativeIDCard;
-    JButton btnSave,btnAdd;
-    JComboBox boxGender, boxCity, boxCountry, boxCrime, boxPunishment, boxDanger, boxRelativeCity, boxRelativeCountry,boxCellroom;
+    JButton btnSave, btnAdd;
+    JComboBox boxGender, boxCity, boxCountry, boxCrime, boxPunishment, boxDanger, boxRelativeCity, boxRelativeCountry, boxCellroom;
     JDatePickerImpl dateBirthPicker, dateArrestPicker;
     JPanel pnlImg;
-    JLabel lblWarn,lblLastId,lblWarnRel;
+    JLabel lblWarn, lblLastId, lblWarnRel;
     File[] selectedFiles;
     JLabel[] labels;
     CardLayout card = new CardLayout();
@@ -163,7 +163,7 @@ public class PrisonerForm extends JDialog {
         tabInfo.add(btnSave);
 
         lblWarn = new JLabel();
-        lblWarn.setBounds(330,485,300,25);
+        lblWarn.setBounds(330, 485, 300, 25);
         tabInfo.add(lblWarn);
 
         JPanel tabCrime = new JPanel();
@@ -199,23 +199,23 @@ public class PrisonerForm extends JDialog {
         tabCrime.add(boxPunishment);
 
         JLabel lblDoA = new JLabel("Date of Arrest");
-        lblDoA.setBounds(30,150,80,25);
+        lblDoA.setBounds(30, 150, 80, 25);
         tabCrime.add(lblDoA);
 
         UtilDateModel model2 = new UtilDateModel();
-        JDatePanelImpl dateArrestPanel = new JDatePanelImpl(model2,p);
-        dateArrestPicker = new JDatePickerImpl(dateArrestPanel,new DateLabelFormatter());
-        dateArrestPicker.setBounds(150,150,200,25);
+        JDatePanelImpl dateArrestPanel = new JDatePanelImpl(model2, p);
+        dateArrestPicker = new JDatePickerImpl(dateArrestPanel, new DateLabelFormatter());
+        dateArrestPicker.setBounds(150, 150, 200, 25);
         tabCrime.add(dateArrestPicker);
 
         JLabel lblcellroom = new JLabel("Cell room");
-        lblcellroom.setBounds(30,190,80,25);
+        lblcellroom.setBounds(30, 190, 80, 25);
         tabCrime.add(lblcellroom);
 
-        String stringCellroom = "Select,"+db.getAllName("cellroom");
+        String stringCellroom = "Select," + db.getAllName("cellroom");
         String[] cellroom = stringCellroom.split(",");
         boxCellroom = new JComboBox(cellroom);
-        boxCellroom.setBounds(150,190,200,25);
+        boxCellroom.setBounds(150, 190, 200, 25);
         tabCrime.add(boxCellroom);
 
         ///Tab Relative
@@ -233,8 +233,6 @@ public class PrisonerForm extends JDialog {
         btnRelativeSearch.setBounds(370, 30, 80, 25);
         btnRelativeSearch.addActionListener(this::searchRelative);
         tabRelavtive.add(btnRelativeSearch);
-
-
 
 
         JLabel lblRelativeName = new JLabel("Name");
@@ -304,20 +302,20 @@ public class PrisonerForm extends JDialog {
         tabRelavtive.add(tfRelationship);
 
         JLabel lblPrisonerId = new JLabel("Prisoner ID");
-        lblPrisonerId.setBounds(30,350,80,25);
+        lblPrisonerId.setBounds(30, 350, 80, 25);
         tabRelavtive.add(lblPrisonerId);
 
         tfPrisonerId = new JTextField();
-        tfPrisonerId.setBounds(150,350,200,25);
+        tfPrisonerId.setBounds(150, 350, 200, 25);
         tabRelavtive.add(tfPrisonerId);
 
         btnAdd = new JButton("Add");
-        btnAdd.setBounds(300,420,80,25);
+        btnAdd.setBounds(300, 420, 80, 25);
         btnAdd.addActionListener(this::addRelative);
         tabRelavtive.add(btnAdd);
 
         lblWarnRel = new JLabel();
-        lblWarnRel.setBounds(280,460,300,25);
+        lblWarnRel.setBounds(280, 460, 300, 25);
         tabRelavtive.add(lblWarnRel);
 
         JTabbedPane tp = new JTabbedPane();
@@ -337,12 +335,14 @@ public class PrisonerForm extends JDialog {
     public void searchPrisoner(ActionEvent e) {
         PrisonerSearchForm psf = new PrisonerSearchForm(this, "Prisoner history", true);
     }
+
     public void nextCard(ActionEvent e) {
         card.next(pnlImg);
         pnlImg.validate();
         pnlImg.repaint();
     }
-    public void save(ActionEvent e){
+
+    public void save(ActionEvent e) {
         DBConnection db = new DBConnection();
         try {
             String idcard = tfIdCard.getText();
@@ -359,17 +359,13 @@ public class PrisonerForm extends JDialog {
             String address = tfAddress.getText();
             int city = db.getColumnID("city", boxCity.getSelectedItem().toString());
             int country = db.getColumnID("country", boxCountry.getSelectedItem().toString());
-            if(idcard.isEmpty()||name.isEmpty()||gender.equals("Select")||address.isEmpty())
-            {
+            if (idcard.isEmpty() || name.isEmpty() || gender.equals("Select") || address.isEmpty()) {
                 lblWarn.setText("Please enter all required information");
                 lblWarn.setForeground(Color.red);
-            }
-            else if ( labels[0].getParent() == null)
-            {
+            } else if (labels[0].getParent() == null) {
                 lblWarn.setText("Please upload images");
                 lblWarn.setForeground(Color.red);
-            }
-            else{
+            } else {
                 prisoner p1 = new prisoner();
                 prisonerhistory ph1 = new prisonerhistory();
                 p1.setPrisoneridcard(idcard);
@@ -402,14 +398,12 @@ public class PrisonerForm extends JDialog {
                 ph1.setCity(city);
                 ph1.setCountry(country);
 
-                if(db.Create(p1) && db.Create(ph1))
-                {
-                    for(int i = 0; i<selectedFiles.length;i++)
-                    {
-                        File dir = new File("src\\images\\"+tfIdCard.getText());
+                if (db.Create(p1) && db.Create(ph1)) {
+                    for (int i = 0; i < selectedFiles.length; i++) {
+                        File dir = new File("src\\images\\" + tfIdCard.getText());
                         dir.mkdir();
                         File file = new File(selectedFiles[i].getAbsolutePath());
-                        file.renameTo(new File("src\\images\\"+tfIdCard.getText()+"\\"+i+".jpg"));
+                        file.renameTo(new File("src\\images\\" + tfIdCard.getText() + "\\" + i + ".jpg"));
                     }
 
                     tfIdCard.setText(null);
@@ -430,11 +424,11 @@ public class PrisonerForm extends JDialog {
                     pnlImg.revalidate();
                     lblWarn.setText("Save successfully");
                     lblWarn.setForeground(Color.green);
+                    lblLastId.setText(String.valueOf(db.getLastId()));
                 }
 
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             lblWarn.setText("Please enter all required information");
             lblWarn.setForeground(Color.red);
@@ -479,38 +473,31 @@ public class PrisonerForm extends JDialog {
         }
 
     }
-    public void addRelative(ActionEvent e)
-    {
-        try{
+
+    public void addRelative(ActionEvent e) {
+        try {
             DBConnection db = new DBConnection();
             String idcard = tfRelativeIDCard.getText();
             String name = tfRelativeName.getText();
             int age = Integer.parseInt(tfRelativeAge.getText());
             String phone = tfRelativePhone.getText();
             String address = tfRelativeAddress.getText();
-            int city = db.getColumnID("city",boxRelativeCity.getSelectedItem().toString());
-            int country = db.getColumnID("country",boxRelativeCountry.getSelectedItem().toString());
+            int city = db.getColumnID("city", boxRelativeCity.getSelectedItem().toString());
+            int country = db.getColumnID("country", boxRelativeCountry.getSelectedItem().toString());
             String relationship = tfRelationship.getText();
             int prisonerid = Integer.parseInt(tfPrisonerId.getText().toString());
-            if(idcard.isEmpty()||name.isEmpty()||phone.isEmpty()||address.isEmpty()||relationship.isEmpty()||prisonerid == 0)
-            {
+            if (idcard.isEmpty() || name.isEmpty() || phone.isEmpty() || address.isEmpty() || relationship.isEmpty() || prisonerid == 0) {
                 lblWarnRel.setText("Please enter all required information");
                 lblWarnRel.setForeground(Color.red);
-            }
-
-            else if(!db.check("checkPrisonerId",String.valueOf(prisonerid))){
+            } else if (!db.check("checkPrisonerId", String.valueOf(prisonerid))) {
 
                 lblWarnRel.setText("Could not find prisoner");
                 lblWarnRel.setForeground(Color.red);
 
-            }
-            else if (db.check("checkRelativeIdCard",idcard))
-            {
+            } else if (db.check("checkRelativeIdCard", idcard)) {
                 lblWarnRel.setText("Relative has already existed");
                 lblWarnRel.setForeground(Color.red);
-            }
-            else
-            {
+            } else {
                 relative r1 = new relative();
                 r1.setRelativeidcard(idcard);
                 r1.setRelativename(name);
@@ -521,57 +508,51 @@ public class PrisonerForm extends JDialog {
                 r1.setCountry(country);
                 r1.setRelationship(relationship);
                 r1.setPrisonerid(prisonerid);
-                if(db.Create(r1))
-                {
-                    if(db.updateRelativePrisoner(String.valueOf(prisonerid),String.valueOf(db.callProc("findrelativeid",idcard))))
-                    {
+                if (db.Create(r1)) {
+                    if (db.updateRelativePrisoner(String.valueOf(prisonerid), String.valueOf(db.callProc("findrelativeid", idcard)))) {
                         lblWarnRel.setText("Save successfully");
                         lblWarnRel.setForeground(Color.green);
                     }
                 }
             }
 
-        }catch (Exception ex)
-        {
+        } catch (Exception ex) {
             lblWarnRel.setText("Please enter all required information");
             lblWarnRel.setForeground(Color.red);
             ex.printStackTrace();
         }
 
     }
-    public Timestamp getTimeStamp(String date){
+
+    public Timestamp getTimeStamp(String date) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date parsedDate = dateFormat.parse(date);
             Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
             return timestamp;
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-    public Timestamp calculateRelease(String punishment){
-        String[] part = punishment.split("\\s+");
-        int intPart = Integer.parseInt(part[0]);
+
+    public Timestamp calculateRelease(String punishment) {
         long arrestTimeInMil = getTimeStamp(dateArrestPicker.getJFormattedTextField().getText()).getTime();
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(arrestTimeInMil);
-        if(part[1].equals("năm"))
-        {
-            cal.add(Calendar.YEAR,intPart);
+        if (!punishment.equals("Chung thân")) {
+            String[] part = punishment.split("\\s+");
+            int intPart = Integer.parseInt(part[0]);
+            if (part[1].equals("năm")) {
+                cal.add(Calendar.YEAR, intPart);
 
-        }
-        else if (part[1].equals("tháng"))
-        {
-            cal.add(Calendar.MONTH,intPart);
-        }
-        else if (punishment.equals("Chung Thân"))
-        {
-            cal.add(Calendar.YEAR,200);
-        }
-        else
-        {
-            cal.add(Calendar.DATE,intPart);
+            } else if (part[1].equals("tháng")) {
+                cal.add(Calendar.MONTH, intPart);
+            } else {
+                cal.add(Calendar.DATE, intPart);
+            }
+        } else {
+            cal.add(Calendar.YEAR, 200);
         }
 
         long releaseTimeInMil = cal.getTimeInMillis();

@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import static forms.EditMainForm.tablePrisoner;
+
 public class PopClickListener extends MouseAdapter {
     public static String relativeid ;
     int r;
@@ -76,12 +78,17 @@ public class PopClickListener extends MouseAdapter {
         JMenuItem editItem = new JMenuItem("Edit prisoner");
         editItem.addActionListener(e1 -> {
             EditPrisonerForm epf = new EditPrisonerForm();
+            DBConnection db = new DBConnection();
+            tablePrisoner.setModel(db.findPrisoner("All",""));
         });
         popupMenu.add(editItem);
 
         JMenuItem historyItem = new JMenuItem("History prisoner");
         historyItem.addActionListener(e1 -> {
             PrisonerHistoryForm phf = new PrisonerHistoryForm();
+
+
+
         });
         popupMenu.add(historyItem);
 

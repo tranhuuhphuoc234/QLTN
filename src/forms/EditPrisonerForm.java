@@ -6,8 +6,6 @@ import utils.DBConnection;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -15,22 +13,24 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import static forms.EditMainForm.tablePrisoner;
+
 public class EditPrisonerForm extends JDialog {
-    String id = EditMainForm.tablePrisoner.getValueAt(0, 0).toString();
-    String idCard = EditMainForm.tablePrisoner.getValueAt(0, 1).toString();
-    String name = EditMainForm.tablePrisoner.getValueAt(0, 2).toString();
-    String age = EditMainForm.tablePrisoner.getValueAt(0, 3).toString();
-    String gender = EditMainForm.tablePrisoner.getValueAt(0, 4).toString();
-    String DateOfBirth = EditMainForm.tablePrisoner.getValueAt(0, 5).toString();
-    String DateOfArrest = EditMainForm.tablePrisoner.getValueAt(0, 6).toString();
-    String DateOfRelease = EditMainForm.tablePrisoner.getValueAt(0, 7).toString();
-    String crimeSelected = EditMainForm.tablePrisoner.getValueAt(0, 8).toString();
-    String punishmentSelected = EditMainForm.tablePrisoner.getValueAt(0, 9).toString();
-    int dangerSelected = Integer.parseInt(EditMainForm.tablePrisoner.getValueAt(0, 10).toString());
-    String cellroomSelected = EditMainForm.tablePrisoner.getValueAt(0, 11).toString();
-    String address = EditMainForm.tablePrisoner.getValueAt(0, 12).toString();
-    String city = EditMainForm.tablePrisoner.getValueAt(0, 13).toString();
-    String country = EditMainForm.tablePrisoner.getValueAt(0, 14).toString();
+    String id = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 0).toString();
+    String idCard = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 1).toString();
+    String name = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 2).toString();
+    String age = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 3).toString();
+    String gender = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 4).toString();
+    String DateOfBirth = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 5).toString();
+    String DateOfArrest = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 6).toString();
+    String DateOfRelease = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 7).toString();
+    String crimeSelected = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 8).toString();
+    String punishmentSelected = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 9).toString();
+    int dangerSelected = Integer.parseInt(tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 10).toString());
+    String cellroomSelected = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 11).toString();
+    String address = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 12).toString();
+    String city = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 13).toString();
+    String country = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 14).toString();
     CardLayout card = new CardLayout();
     JLabel[] labels;
     JPanel pnlImg;
@@ -239,6 +239,8 @@ public class EditPrisonerForm extends JDialog {
                         ph.setDateofarrest(getTimeStamp(getCurrentTime()));
                         ph.setDateofrelease(timeRelease);
                         db.Create(ph);
+                        this.dispose();
+
                     }
                 }
             }
@@ -265,20 +267,22 @@ public class EditPrisonerForm extends JDialog {
     }
 
     public Timestamp calculateRelease(String punishment, Timestamp time) {
-        String[] part = punishment.split("\\s+");
-        int intPart = Integer.parseInt(part[0]);
         long arrestTimeInMil = time.getTime();
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(arrestTimeInMil);
-        if (part[1].equals("năm")) {
-            cal.add(Calendar.YEAR, intPart);
+        if (!punishment.equals("Chung thân")) {
+            String[] part = punishment.split("\\s+");
+            int intPart = Integer.parseInt(part[0]);
+            if (part[1].equals("năm")) {
+                cal.add(Calendar.YEAR, intPart);
 
-        } else if (part[1].equals("tháng")) {
-            cal.add(Calendar.MONTH, intPart);
-        } else if (punishment.equals("Chung Thân")) {
-            cal.add(Calendar.YEAR, 200);
+            } else if (part[1].equals("tháng")) {
+                cal.add(Calendar.MONTH, intPart);
+            } else {
+                cal.add(Calendar.DATE, intPart);
+            }
         } else {
-            cal.add(Calendar.DATE, intPart);
+            cal.add(Calendar.YEAR, 200);
         }
 
         long releaseTimeInMil = cal.getTimeInMillis();

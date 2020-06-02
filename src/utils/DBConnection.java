@@ -37,7 +37,7 @@ public class DBConnection<T> {
             }
             query = query.substring(0, query.length() - 1);
             query += ")";
-            System.out.println(query);
+
             PreparedStatement pstmt = con.prepareStatement(query);
             int check = pstmt.executeUpdate();
             if (check == 1) {
@@ -65,6 +65,7 @@ public class DBConnection<T> {
             {
                 query ="checkprisonerid "+value;
             }
+
             ResultSet rs = stmt.executeQuery(query);
             if (rs.next()) {
                 return true;
@@ -83,7 +84,6 @@ public class DBConnection<T> {
         {
             String query = "update relative set relativephone = '"+phone+"' ,relativeaddress = '"+address+"' ,city = "+city+" ,country = "+country+" ,relationship = '"+relationship
                     +"' ,prisonerid = "+prisonerid+" where relativeidcard = '"+idcard+"'";
-            System.out.println(query);
             PreparedStatement pstmt = con.prepareStatement(query);
             if (pstmt.executeUpdate()!=0)
             {
@@ -347,6 +347,7 @@ public class DBConnection<T> {
             }
             if(!find.equals("idcard")) {
                 ResultSet rs = stmt.executeQuery(query);
+
                 DefaultTableModel model = new DefaultTableModel() {
                     public boolean isCellEditable(int row, int col)/// lam bang k chinh sua dc
                     {
