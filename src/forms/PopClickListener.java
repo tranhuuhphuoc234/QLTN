@@ -69,6 +69,14 @@ public class PopClickListener extends MouseAdapter {
             WarningRelativeForm wrf = new WarningRelativeForm();
         });
         popupMenu.add(removeItem);
+        DBConnection db = new DBConnection();
+        if (!db.checkAccess(LoginForm.userName))
+        {
+            removeItem.setEnabled(false);
+        }
+        else {
+            removeItem.setEnabled(true);
+        }
         popupMenu.show(e.getComponent(),e.getX(),e.getY());
     }
     public void prisonerEdit(MouseEvent e)
@@ -98,7 +106,14 @@ public class PopClickListener extends MouseAdapter {
 
         });
         popupMenu.add(removeItem);
-
+        DBConnection db = new DBConnection();
+        if(!db.checkAccess(LoginForm.userName))
+        {
+            removeItem.setEnabled(false);
+        }
+        else{
+            removeItem.setEnabled(true);
+        }
 
 
         popupMenu.show(e.getComponent(),e.getX(),e.getY());

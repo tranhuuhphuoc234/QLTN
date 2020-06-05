@@ -30,14 +30,12 @@ public class DBConnection<T> {
                     query += "'" + fieldItem.get(item) + "',";
                 } else if (fieldItem.getType().equals(int.class)) {
                     query += fieldItem.get(item) + ",";
-                } else {
-                    query += "convert(VARBINARY(max),'" + fieldItem.get(item) + "'),";
                 }
 
             }
             query = query.substring(0, query.length() - 1);
             query += ")";
-
+            System.out.println(query);
             PreparedStatement pstmt = con.prepareStatement(query);
             int check = pstmt.executeUpdate();
             if (check == 1) {
@@ -56,7 +54,7 @@ public class DBConnection<T> {
             Statement stmt = con.createStatement();
             String query = "";
             if (check.equals("checkUser")) {
-                query = "SELECT USERNAME FROM USERS WHERE USERNAME ='" + value + "'";
+                query = "SELECT username FROM users WHERE username ='" + value + "'";
             }
             else if (check.equals("checkRelativeIdCard")) {
                 query = "SELECT relativeidcard FROM relative WHERE relativeidcard ='" + value + "'";
@@ -75,6 +73,39 @@ public class DBConnection<T> {
             e.printStackTrace();
 
 
+        }
+        return false;
+    }
+    public boolean checkPass(String username, String password) {
+        try (Connection con = DriverManager.getConnection(urlConnection)) {
+            Statement stmt = con.createStatement();
+            String query = "SELECT PASSWORD FROM USERS WHERE USERNAME ='" + username + "' AND password ='"+password+"'";
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+
+                    return true; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public boolean checkAccess(String username){
+        try(Connection con = DriverManager.getConnection(urlConnection))
+        {
+            String query = "select checkacc from users where username ='"+username+"'";
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                if (rs.getInt("checkacc") == 1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
         }
         return false;
     }
