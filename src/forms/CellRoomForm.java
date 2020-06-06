@@ -1,7 +1,6 @@
 package forms;
 
-import models.entitites.prisoner;
-import models.entitites.cellroom;
+import models.entities.*;
 import utils.DBConnection;
 
 import javax.swing.*;
@@ -293,7 +292,7 @@ public class CellRoomForm extends JFrame {
                 list = getListPrisoner();
                 for (prisoner p : list) {
                     model.addRow(new Object[]{
-                            p.getPrisonerid(), p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry(), p.getRelative(),
+                            p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry(),
                     });
                 }
             }
@@ -309,7 +308,6 @@ public class CellRoomForm extends JFrame {
                     ResultSet rs = ps.executeQuery();
                     while (rs.next()){
                         prisoner p = new prisoner();
-                        p.setPrisonerid(rs.getInt("prisonerid"));
                         p.setPrisoneridcard(rs.getString("prisoneridcard"));
                         p.setPrisonername(rs.getString("prisonername"));
                         p.setPrisonerage(rs.getInt("prisonerage"));
@@ -323,7 +321,6 @@ public class CellRoomForm extends JFrame {
                         p.setAddress(rs.getString("address"));
                         p.setCity(rs.getInt("city"));
                         p.setCountry(rs.getInt("country"));
-                        p.setRelative(rs.getInt("relative"));
                         list.add(p);
                     }
                 } catch (Exception throwables) {
@@ -343,7 +340,6 @@ public class CellRoomForm extends JFrame {
                     ResultSet rs = ps.executeQuery();
                     while (rs.next()){
                         prisoner p = new prisoner();
-                        p.setPrisonerid(rs.getInt("prisonerid"));
                         p.setPrisoneridcard(rs.getString("prisoneridcard"));
                         p.setPrisonername(rs.getString("prisonername"));
                         p.setPrisonerage(rs.getInt("prisonerage"));
@@ -357,7 +353,6 @@ public class CellRoomForm extends JFrame {
                         p.setAddress(rs.getString("address"));
                         p.setCity(rs.getInt("city"));
                         p.setCountry(rs.getInt("country"));
-                        p.setRelative(rs.getInt("relative"));
                         listfind.add(p);
                     }
                 } catch (Exception throwables) {
@@ -371,7 +366,7 @@ public class CellRoomForm extends JFrame {
                 list = getListPrisonerFind(cellroom);
                 for (prisoner p : list) {
                     model.addRow(new Object[]{
-                            p.getPrisonerid(), p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry(), p.getRelative(),
+                             p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
                     });
                 }
             }
@@ -383,7 +378,7 @@ public class CellRoomForm extends JFrame {
         model = (DefaultTableModel) tableUpdate.getModel();
         model.setRowCount(0);
 
-        List<models.entitites.cellroom> listCellRoom = getListCellroom();
+        List<models.entities.cellroom> listCellRoom = getListCellroom();
         for (cellroom c : getListCellroom()) {
             model.addRow(new Object[]{
                     c.getCellroomid(), c.getCellroomname(), c.getCellroomtype(),
@@ -397,7 +392,7 @@ public class CellRoomForm extends JFrame {
         list = getListPrisoner();
         for (prisoner p : list) {
             model.addRow(new Object[]{
-                    p.getPrisonerid(), p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry(), p.getRelative(),
+                    p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
             });
         }
     }
@@ -412,7 +407,6 @@ public class CellRoomForm extends JFrame {
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 prisoner p = new prisoner();
-                p.setPrisonerid(rs.getInt("prisonerid"));
                 p.setPrisoneridcard(rs.getString("prisoneridcard"));
                 p.setPrisonername(rs.getString("prisonername"));
                 p.setPrisonerage(rs.getInt("prisonerage"));
@@ -426,7 +420,6 @@ public class CellRoomForm extends JFrame {
                 p.setAddress(rs.getString("address"));
                 p.setCity(rs.getInt("city"));
                 p.setCountry(rs.getInt("country"));
-                p.setRelative(rs.getInt("relative"));
                 list.add(p);
             }
         } catch (Exception throwables) {
@@ -466,7 +459,6 @@ public class CellRoomForm extends JFrame {
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 prisoner p = new prisoner();
-                p.setPrisonerid(rs.getInt("prisonerid"));
                 p.setPrisoneridcard(rs.getString("prisoneridcard"));
                 p.setPrisonername(rs.getString("prisonername"));
                 p.setPrisonerage(rs.getInt("prisonerage"));
@@ -480,7 +472,6 @@ public class CellRoomForm extends JFrame {
                 p.setAddress(rs.getString("address"));
                 p.setCity(rs.getInt("city"));
                 p.setCountry(rs.getInt("country"));
-                p.setRelative(rs.getInt("relative"));
                 listfind.add(p);
             }
         } catch (Exception throwables) {
@@ -494,7 +485,7 @@ public class CellRoomForm extends JFrame {
         list = getListPrisonerFind(cellroom);
         for (prisoner p : list) {
             model.addRow(new Object[]{
-                    p.getPrisonerid(), p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry(), p.getRelative(),
+                     p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
             });
         }
     }

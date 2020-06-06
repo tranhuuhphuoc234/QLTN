@@ -179,7 +179,21 @@ public class DBConnection<T> {
         }
         return 0;
     }
-
+    public int getLastIdCellRoom(){
+        try(Connection con = DriverManager.getConnection(urlConnection))
+        {
+            Statement stmt = con.createStatement();
+            String query = "SELECT TOP 1 cellroomid from cellroom order by cellroom DESC";
+            ResultSet rs = stmt.executeQuery(query);
+            if ( rs.next())
+            {
+                return rs.getInt(1);
+            }
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        } return  0;
+    }
     public String getAllName(String tableName) {
         try (Connection con = DriverManager.getConnection(urlConnection)) {
             Statement stmt = con.createStatement();
@@ -197,6 +211,7 @@ public class DBConnection<T> {
         }
         return "";
     }
+
     public DefaultTableModel getRelative(String name, String value){
         try (Connection con = DriverManager.getConnection(urlConnection))
         {
@@ -298,6 +313,22 @@ public class DBConnection<T> {
             e.printStackTrace();
         }
         return false;
+    }
+    public Timestamp checkVisitDate(String value){
+        try (Connection con = DriverManager.getConnection(urlConnection))
+        {
+            String query = "checkvisitdate '"+value+"'";
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+            {
+                return rs.getTimestamp(1);
+            }
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
     public boolean updateRelativePrisoner(String priosnerId, String relativeid){
         int check ;

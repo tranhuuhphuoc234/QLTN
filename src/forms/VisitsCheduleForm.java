@@ -1,6 +1,6 @@
 package forms;
 
-import models.entitites.VisitsChedule;
+import models.entities.VisitsChedule;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;

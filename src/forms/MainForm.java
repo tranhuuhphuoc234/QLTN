@@ -1,11 +1,5 @@
 package forms;
 
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -33,7 +27,7 @@ public class MainForm extends JFrame {
         contentPane.add(lb1);
 
         JLabel lbimg = new JLabel();
-        lbimg.setIcon(new ImageIcon("code\\QLTN\\src\\models\\image\\logo.png"));
+        lbimg.setIcon(new ImageIcon("src\\models\\image\\logo.png"));
         lbimg.setBounds(0, 0, 720, 580);
         getContentPane().add(lbimg);
 
