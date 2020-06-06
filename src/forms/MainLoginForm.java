@@ -3,10 +3,10 @@ package forms;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainForm extends JFrame {
+public class MainLoginForm extends JFrame {
     JPanel defaultpnl;
 
-    public MainForm(String title) throws HeadlessException {
+    public MainLoginForm(String title) throws HeadlessException {
         super(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         defaultpnl = (JPanel) getContentPane();
