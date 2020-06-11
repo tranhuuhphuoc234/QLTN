@@ -171,24 +171,24 @@ public class EditPrisonerForm extends JDialog {
             pnlImg.repaint();
         });
         add(btnNext);
-
         File dir = new File("src\\images\\" + idCard);
-        labels = new JLabel[dir.listFiles().length];
-        for (int i = 0; i < dir.listFiles().length; i++) {
-            String path = "src\\images\\" + idCard + "\\" + i + ".jpg";
-            try {
-                Image image = ImageIO.read(new File(path));
-                Image imageScaled = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-                labels[i] = new JLabel();
-                labels[i].setIcon(new ImageIcon(imageScaled));
-                pnlImg.add(labels[i]);
-                pnlImg.validate();
-                pnlImg.repaint();
-            } catch (IOException io) {
-                io.printStackTrace();
+        if(dir.exists()) {
+            labels = new JLabel[dir.listFiles().length];
+            for (int i = 0; i < dir.listFiles().length; i++) {
+                String path = "src\\images\\" + idCard + "\\" + i + ".jpg";
+                try {
+                    Image image = ImageIO.read(new File(path));
+                    Image imageScaled = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                    labels[i] = new JLabel();
+                    labels[i].setIcon(new ImageIcon(imageScaled));
+                    pnlImg.add(labels[i]);
+                    pnlImg.validate();
+                    pnlImg.repaint();
+                } catch (IOException io) {
+                    io.printStackTrace();
+                }
             }
         }
-
 
         JLabel lblWarn = new JLabel();
         lblWarn.setBounds(165, 570, 300, 25);

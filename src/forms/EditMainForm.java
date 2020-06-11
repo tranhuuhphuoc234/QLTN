@@ -18,6 +18,8 @@ public class EditMainForm extends JFrame {
     CardLayout card = new CardLayout();
     JLabel[] labels;
     JPanel pnlImg;
+    String idcard;
+    File dir;
     public EditMainForm(String title) throws HeadlessException {
         super(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -250,31 +252,17 @@ public class EditMainForm extends JFrame {
         tablePrisoner.setModel(db.findPrisoner("All",""));
         tablePrisoner.addMouseListener(new PopClickListener());
         tablePrisoner.getSelectionModel().addListSelectionListener(e -> {
-          String idcard = "";
+          idcard = "";
             try {
                idcard = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 1).toString();
           } catch (Exception ex)
           {
               ex.printStackTrace();
           }
-            File dir = new File("src\\images\\"+idcard);
-            labels = new JLabel[dir.listFiles().length];
-            pnlImg.removeAll();
-            for (int i = 0; i<dir.listFiles().length;i++) {
-                String path = "src\\images\\"+idcard+"\\"+i+".jpg";
-                try {
-                    Image image = ImageIO.read(new File(path));
-                    Image imageScaled = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-                    pnlImg.setBorder(null);
-                    labels[i] = new JLabel();
-                    labels[i].setIcon(new ImageIcon(imageScaled));
-                    pnlImg.add(labels[i]);
-                    pnlImg.validate();
-                    pnlImg.repaint();
-
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+            dir = new File("src\\images\\"+idcard);
+            if(dir.exists())
+            {
+                findImg();
             }
         });
         JScrollPane spPrisoner = new JScrollPane(tablePrisoner);
@@ -298,5 +286,26 @@ public class EditMainForm extends JFrame {
         card.next(pnlImg);
         pnlImg.validate();
         pnlImg.repaint();
+    }
+    public void findImg(){{
+        dir = new File("src\\images\\"+idcard);
+        labels = new JLabel[dir.listFiles().length];
+        pnlImg.removeAll();
+        for (int i = 0; i<dir.listFiles().length;i++) {
+            String path = "src\\images\\"+idcard+"\\"+i+".jpg";
+            try {
+                Image image = ImageIO.read(new File(path));
+                Image imageScaled = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                pnlImg.setBorder(null);
+                labels[i] = new JLabel();
+                labels[i].setIcon(new ImageIcon(imageScaled));
+                pnlImg.add(labels[i]);
+                pnlImg.validate();
+                pnlImg.repaint();
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }}
     }
 }

@@ -325,6 +325,7 @@ public class PrisonerForm extends JDialog {
         add(tp);
 
 
+
         setVisible(true);
     }
 
