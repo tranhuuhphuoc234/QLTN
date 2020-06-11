@@ -62,6 +62,8 @@ public class DBConnection<T> {
             else if (check.equals("checkPrisonerId"))
             {
                 query ="checkprisonerid "+value;
+            }else if(check.equals("checkrelative")){
+                query = "checkrelative '" + value + "'";
             }
 
             ResultSet rs = stmt.executeQuery(query);
@@ -76,14 +78,44 @@ public class DBConnection<T> {
         }
         return false;
     }
+    public int checkprisonerID(String check, String value){
+        int id = 0;
+        try(Connection con=DriverManager.getConnection(urlConnection)){
+            Statement stmt=con.createStatement();
+            String query="select prisonerid from relative where relativeidcard = '" + value + "'";
+            if(check == "checkprisonerid"){
+                ResultSet rs=stmt.executeQuery(query);
+                if(rs.next()){
+                    id = rs.getInt("prisonerid");
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return id;
+    }
+    public int checkcellroomtype(int value){
+        int crt = 0;
+        try(Connection con=DriverManager.getConnection(urlConnection)){
+            Statement stmt=con.createStatement();
+            String query="select cellroomtype from cellroom where cellroomid = " + value + "";
+            ResultSet rs=stmt.executeQuery(query);
+                if(rs.next()){
+                    crt = rs.getInt("cellroomtype");
+                }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return crt;
+    }
     public boolean checkPass(String username, String password) {
         try (Connection con = DriverManager.getConnection(urlConnection)) {
             Statement stmt = con.createStatement();
             String query = "SELECT PASSWORD FROM USERS WHERE USERNAME ='" + username + "' AND password ='"+password+"'";
             ResultSet rs = stmt.executeQuery(query);
             if (rs.next()) {
-
-                    return true; }
+                return true;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -183,7 +215,7 @@ public class DBConnection<T> {
         try(Connection con = DriverManager.getConnection(urlConnection))
         {
             Statement stmt = con.createStatement();
-            String query = "SELECT TOP 1 cellroomid from cellroom order by cellroom DESC";
+            String query = "SELECT TOP 1 cellroomid from cellroom order by cellroomid DESC";
             ResultSet rs = stmt.executeQuery(query);
             if ( rs.next())
             {
@@ -199,6 +231,23 @@ public class DBConnection<T> {
             Statement stmt = con.createStatement();
             String columnName = tableName + "name";
             String query = "SELECT DISTINCT " + columnName + " FROM " + tableName;
+            ResultSet rs = stmt.executeQuery(query);
+            String allName = "";
+            while (rs.next()) {
+                allName += rs.getString(columnName) + ",";
+            }
+            allName = allName.substring(0, allName.length() - 1); //loai bo dau phay cuoi
+            return allName;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    public String getAllNameCellroom(String tableName) {
+        try (Connection con = DriverManager.getConnection(urlConnection)) {
+            Statement stmt = con.createStatement();
+            String columnName = tableName + "name";
+            String query = "SELECT " + columnName + " FROM " + tableName;
             ResultSet rs = stmt.executeQuery(query);
             String allName = "";
             while (rs.next()) {
@@ -329,6 +378,22 @@ public class DBConnection<T> {
             e.printStackTrace();
         }
         return null;
+    }
+    public int checkRelative(String value){
+        try (Connection con = DriverManager.getConnection(urlConnection))
+        {
+            String query = "checkrelative '"+value+"'";
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+            {
+                return rs.getInt(1);
+            }
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return 0;
     }
     public boolean updateRelativePrisoner(String priosnerId, String relativeid){
         int check ;

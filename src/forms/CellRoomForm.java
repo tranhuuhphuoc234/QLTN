@@ -4,6 +4,8 @@ import models.entities.*;
 import utils.DBConnection;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,7 +20,7 @@ public class CellRoomForm extends JFrame {
     DefaultTableModel model;
     private JTable table;
     private JTable tableUpdate;
-    private ArrayList<prisoner> list;
+    private ArrayList<prisonerlist> list;
     public CellRoomForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setIconImage(Toolkit.getDefaultToolkit().getImage("code\\QLTN\\src\\models\\image\\polic.png"));
@@ -105,15 +107,33 @@ public class CellRoomForm extends JFrame {
                 String crn=tftCellRoomName.getText();
                 String crt=cbCellroomtype.getSelectedItem().toString();
 //                Integer crt=Integer.parseInt(cbCellroomtype.getSelectedItem().toString());
-                DBConnection db=new DBConnection();
-
                 String urlConnection = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
                 try(Connection con = DriverManager.getConnection(urlConnection)){
-                    Statement stmt = con.createStatement();
-                    String query = "INSERT INTO cellroom VALUES(N'" +  crn + "'," + db.getColumnID("cellroomtype", crt) + ")";
+                    if(!crn.equals("")){
+                        if(!crt.equals("Select")){
+                            Statement stmt = con.createStatement();
+                            String query = "INSERT INTO cellroom VALUES(N'" +  crn + "'," + db.getColumnID("cellroomtype", crt) + ")";
+                            int check = stmt.executeUpdate(query);
+                            if(check != 0)
+                            {
+                                JOptionPane.showMessageDialog(cbCellroomtype, "Add Success !!");
+                                lblLastIdCellRoom.setText(String.valueOf(lastestIdCellRoom + 1));
+                                tftCellRoomName.setText("");
+                                cbCellroomtype.setSelectedIndex(0);
+                            }else {
+                                JOptionPane.showMessageDialog(cbCellroomtype, "Add Fail !!");
+                            }
+                        }else {
+                            JOptionPane.showMessageDialog(cbCellroomtype, "Cellroom Type incorrect !!");
+                        }
+                    }else {
+                        JOptionPane.showMessageDialog(cbCellroomtype, "Cellroom Name incorrect !!");
+                    }
                 }catch (SQLException a) {
                     a.printStackTrace();
                 }
+                getListCellroom();
+                showTableCellRoom();
             }
         });
         //-------------------------------PANEL UPDATE----------------------------
@@ -196,19 +216,33 @@ public class CellRoomForm extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                     try{
-                        String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
-                        Connection conn= DriverManager.getConnection(connectionUrl);
-                        String query = "UPDATE cellroom SET cellroomtype = " + tftCellroomType.getText() + " WHERE cellroomid = " + tftCellroomID.getText();
-                        Statement stmt = conn.createStatement();
-                        stmt.executeUpdate(query);
+                        if(!tftCellroomType.getText().equals("")){
+//                            if(db.checkcellroomtype()){
+                            int cellroomid = Integer.parseInt(tftCellroomID.getText());
+                            int cellroomtype = Integer.parseInt(tftCellroomType.getText());
+                            if (db.checkcellroomtype(cellroomid) != cellroomtype) {
+                                String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
+                                Connection conn= DriverManager.getConnection(connectionUrl);
+                                String query = "UPDATE cellroom SET cellroomtype = " + tftCellroomType.getText() + " WHERE cellroomid = " + tftCellroomID.getText();
+                                Statement stmt = conn.createStatement();
+                                int check = stmt.executeUpdate(query);
+                                if(check != 0){
+                                    JOptionPane.showMessageDialog(tftCellroomNameUpdate, "Update Success !!");
+                                }else {
+                                    JOptionPane.showMessageDialog(tftCellroomNameUpdate, "Update Fail!!");
+                                }
+                            }else {
+                                JOptionPane.showMessageDialog(tftCellroomNameUpdate,cellroomtype + " is the current cellroom type !!");
+                            }
+
+                        }else {
+                            JOptionPane.showMessageDialog(tftCellroomNameUpdate, "CellroomType incorrect !!");
+                        }
                     } catch (Exception throwables) {
                         throwables.printStackTrace();
                     }
                     getListCellroom();
                     showTableCellRoom();;
-//                }else {
-//                    JOptionPane.showMessageDialog(null, "error");
-//                }
             }
         });
 
@@ -235,7 +269,7 @@ public class CellRoomForm extends JFrame {
                 new Object[][] {
                 },
                 new String[] {
-                        "prisonerid", "prisoneridcard", "prisonername", "prisonerage", "gender", "dateofbirth", "dateofarrest", "crime", "dangerlevel", "punishment", "cellroom", "address", "city", "country", "relative"
+                        "prisonerid","prisoneridcard", "prisonername", "prisonerage", "gender", "dateofbirth", "dateofarrest", "crime", "dangerlevel", "punishment", "cellroom", "address", "city", "country"
                 }
         ));
         getListPrisoner();
@@ -255,7 +289,7 @@ public class CellRoomForm extends JFrame {
         lblCellRoomSearch.setBounds(22, 47, 87, 13);
         panelSearch.add(lblCellRoomSearch);
 
-        String stringCellroom = "All,"+db.getAllName("cellroom");
+        String stringCellroom = "All,"+db.getAllNameCellroom("cellroom");
         final String[][] cellroom = {stringCellroom.split(",")};
         JComboBox cbCellroom = new JComboBox(cellroom[0]);
         JSplitPane splitCellroom = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -290,16 +324,16 @@ public class CellRoomForm extends JFrame {
                 model.setRowCount(0);
 
                 list = getListPrisoner();
-                for (prisoner p : list) {
+                for (prisonerlist p : list) {
                     model.addRow(new Object[]{
-                            p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry(),
+                             p.getPrisonerid(), p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry(),
                     });
                 }
             }
 
-            public ArrayList<prisoner> getListPrisoner(){
-                ArrayList<prisoner> list=new ArrayList<>();
-                String sql = "select * from prisoner";
+            public ArrayList<prisonerlist> getListPrisoner(){
+                ArrayList<prisonerlist> list=new ArrayList<>();
+                String sql = "select prisonerid, prisoneridcard, prisonername, prisonerage, gender, convert(nvarchar, dateofbirth, 103) as dateofbirth,convert(nvarchar, dateofarrest, 103) as dateofarrest, crime, dangerlevel, punishment, cellroom, address, city, country from prisoner";
 
                 try{
                     String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
@@ -307,13 +341,14 @@ public class CellRoomForm extends JFrame {
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery();
                     while (rs.next()){
-                        prisoner p = new prisoner();
+                        prisonerlist p = new prisonerlist();
+                        p.setPrisonerid(rs.getInt("prisonerid"));
                         p.setPrisoneridcard(rs.getString("prisoneridcard"));
                         p.setPrisonername(rs.getString("prisonername"));
                         p.setPrisonerage(rs.getInt("prisonerage"));
                         p.setGender(rs.getString("gender"));
-                        p.setDateofbirth(rs.getTimestamp("dateofbirth"));
-                        p.setDateofarrest(rs.getTimestamp("dateofarrest"));
+                        p.setDateofbirth(rs.getString("dateofbirth"));
+                        p.setDateofarrest(rs.getString("dateofarrest"));
                         p.setCrime(rs.getInt("crime"));
                         p.setDangerlevel(rs.getInt("dangerlevel"));
                         p.setPunishment(rs.getInt("punishment"));
@@ -329,9 +364,9 @@ public class CellRoomForm extends JFrame {
                 return list;
             }
 
-            public ArrayList<prisoner> getListPrisonerFind(Integer cellroom){
-                ArrayList<prisoner> listfind=new ArrayList<>();
-                String sql = "select * from prisoner where cellroom = " + cellroom;
+            public ArrayList<prisonerlist> getListPrisonerFind(Integer cellroom){
+                ArrayList<prisonerlist> listfind=new ArrayList<>();
+                String sql = "select prisonerid, prisoneridcard, prisonername, prisonerage, gender, convert(nvarchar, dateofbirth, 103) as dateofbirth,convert(nvarchar, dateofarrest, 103) as dateofarrest, crime, dangerlevel, punishment, cellroom, address, city, country from prisoner where cellroom = " + cellroom;
 
                 try{
                     String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
@@ -339,13 +374,14 @@ public class CellRoomForm extends JFrame {
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery();
                     while (rs.next()){
-                        prisoner p = new prisoner();
+                        prisonerlist p = new prisonerlist();
+                        p.setPrisonerid(rs.getInt("prisonerid"));
                         p.setPrisoneridcard(rs.getString("prisoneridcard"));
                         p.setPrisonername(rs.getString("prisonername"));
                         p.setPrisonerage(rs.getInt("prisonerage"));
                         p.setGender(rs.getString("gender"));
-                        p.setDateofbirth(rs.getTimestamp("dateofbirth"));
-                        p.setDateofarrest(rs.getTimestamp("dateofarrest"));
+                        p.setDateofbirth(rs.getString("dateofbirth"));
+                        p.setDateofarrest(rs.getString("dateofarrest"));
                         p.setCrime(rs.getInt("crime"));
                         p.setDangerlevel(rs.getInt("dangerlevel"));
                         p.setPunishment(rs.getInt("punishment"));
@@ -364,9 +400,9 @@ public class CellRoomForm extends JFrame {
                 model = (DefaultTableModel) table.getModel();
                 model.setRowCount(0);
                 list = getListPrisonerFind(cellroom);
-                for (prisoner p : list) {
+                for (prisonerlist p : list) {
                     model.addRow(new Object[]{
-                             p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
+                            p.getPrisonerid(), p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
                     });
                 }
             }
@@ -390,15 +426,16 @@ public class CellRoomForm extends JFrame {
         model.setRowCount(0);
 
         list = getListPrisoner();
-        for (prisoner p : list) {
+        for (prisonerlist p : list) {
             model.addRow(new Object[]{
-                    p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
+                    p.getPrisonerid(), p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
             });
         }
     }
-    public ArrayList<prisoner> getListPrisoner(){
-        ArrayList<prisoner> list=new ArrayList<>();
-        String sql = "select * from prisoner";
+    public ArrayList<prisonerlist> getListPrisoner(){
+        ArrayList<prisonerlist> list=new ArrayList<>();
+        String sql = "select prisonerid, prisoneridcard, prisonername, prisonerage, gender, convert(nvarchar, dateofbirth, 103) as dateofbirth,convert(nvarchar, dateofarrest, 103) as dateofarrest, crime, dangerlevel, punishment, cellroom, address, city, country from prisoner";
+
 
         try{
             String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
@@ -406,13 +443,14 @@ public class CellRoomForm extends JFrame {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
-                prisoner p = new prisoner();
+                prisonerlist p = new prisonerlist();
+                p.setPrisonerid(rs.getInt("prisonerid"));
                 p.setPrisoneridcard(rs.getString("prisoneridcard"));
                 p.setPrisonername(rs.getString("prisonername"));
                 p.setPrisonerage(rs.getInt("prisonerage"));
                 p.setGender(rs.getString("gender"));
-                p.setDateofbirth(rs.getTimestamp("dateofbirth"));
-                p.setDateofarrest(rs.getTimestamp("dateofarrest"));
+                p.setDateofbirth(rs.getString("dateofbirth"));
+                p.setDateofarrest(rs.getString("dateofarrest"));
                 p.setCrime(rs.getInt("crime"));
                 p.setDangerlevel(rs.getInt("dangerlevel"));
                 p.setPunishment(rs.getInt("punishment"));
@@ -448,9 +486,9 @@ public class CellRoomForm extends JFrame {
         }
         return listCellRoom;
     }
-    public ArrayList<prisoner> getListPrisonerFind(Integer cellroom){
-        ArrayList<prisoner> listfind=new ArrayList<>();
-        String sql = "select * from prisoner where cellroom = " + cellroom;
+    public ArrayList<prisonerlist> getListPrisonerFind(Integer cellroom){
+        ArrayList<prisonerlist> listfind=new ArrayList<>();
+        String sql = "select prisonerid, prisoneridcard, prisonername, prisonerage, gender, convert(nvarchar, dateofbirth, 103) as dateofbirth,convert(nvarchar, dateofarrest, 103) as dateofarrest, crime, dangerlevel, punishment, cellroom, address, city, country from prisoner where cellroom = " + cellroom;
 
         try{
             String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
@@ -458,13 +496,14 @@ public class CellRoomForm extends JFrame {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
-                prisoner p = new prisoner();
+                prisonerlist p = new prisonerlist();
+                p.setPrisonerid(rs.getInt("prisonerid"));
                 p.setPrisoneridcard(rs.getString("prisoneridcard"));
                 p.setPrisonername(rs.getString("prisonername"));
                 p.setPrisonerage(rs.getInt("prisonerage"));
                 p.setGender(rs.getString("gender"));
-                p.setDateofbirth(rs.getTimestamp("dateofbirth"));
-                p.setDateofarrest(rs.getTimestamp("dateofarrest"));
+                p.setDateofbirth(rs.getString("dateofbirth"));
+                p.setDateofarrest(rs.getString("dateofarrest"));
                 p.setCrime(rs.getInt("crime"));
                 p.setDangerlevel(rs.getInt("dangerlevel"));
                 p.setPunishment(rs.getInt("punishment"));
@@ -483,9 +522,9 @@ public class CellRoomForm extends JFrame {
         model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
         list = getListPrisonerFind(cellroom);
-        for (prisoner p : list) {
+        for (prisonerlist p : list) {
             model.addRow(new Object[]{
-                     p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
+                    p.getPrisonerid(), p.getPrisoneridcard(), p.getPrisonername(),p.getPrisonerage(), p.getGender(), p.getDateofbirth(), p.getDateofarrest(), p.getCrime(), p.getDangerlevel(), p.getPunishment(), p.getCellroom(), p.getAddress(), p.getCity(), p.getCountry()
             });
         }
     }

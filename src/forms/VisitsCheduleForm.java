@@ -23,32 +23,33 @@ public class VisitsCheduleForm extends JFrame {
     private JTable table;
     private JTextField tftSearch;
     private JComboBox bs;
-    public VisitsCheduleForm(){
+
+    public VisitsCheduleForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("VisitsChedule Form");
-        setBounds(400,230,600,350);
+        setBounds(400, 230, 600, 350);
         setLayout(null);
-        JPanel contentPane=new JPanel();
+        JPanel contentPane = new JPanel();
         setContentPane(contentPane);
         contentPane.setLayout(null);
         contentPane.setBackground(Color.DARK_GRAY);
 
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.setBounds(0, 0, 586,313);
+        tabbedPane.setBounds(0, 0, 586, 313);
         contentPane.add(tabbedPane);
 
-        JMenuBar mnb=new JMenuBar();
+        JMenuBar mnb = new JMenuBar();
         setJMenuBar(mnb);
 
-        JMenu menu=new JMenu("Menu");
+        JMenu menu = new JMenu("Menu");
         mnb.add(menu);
-        JMenuItem mni=new JMenuItem("Logout");
+        JMenuItem mni = new JMenuItem("Logout");
         menu.add(mni);
         mni.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                MainForm mf=new MainForm();
+                MainForm mf = new MainForm();
             }
         });
 
@@ -70,6 +71,38 @@ public class VisitsCheduleForm extends JFrame {
         panelAdd.setBackground(Color.DARK_GRAY);
         panelAdd.setLayout(null);
 
+        JButton btSearch = new JButton("Search");
+        btSearch.setBounds(410, 60, 90, 20);
+        panelVC.add(btSearch);
+        btSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getListVisitSearch(bs.getSelectedItem().toString());
+                showTableSearch();
+            }
+        });
+
+        tftSearch = new JTextField();
+        tftSearch.setEditable(false);
+        tftSearch.setBounds(260, 60, 130, 19);
+        panelVC.add(tftSearch);
+
+        String[] cbSearch = {"All", "prisonerid", "visitorid"};
+        bs = new JComboBox(cbSearch);
+        bs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tftSearch.setText("");
+                if (!bs.getSelectedItem().equals("All")) {
+                    tftSearch.setEditable(true);
+                } else {
+                    tftSearch.setEditable(false);
+                }
+            }
+        });
+        bs.setBounds(100, 60, 150, 19);
+        panelVC.add(bs);
+
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(35, 80, 510, 118);
         panelVC.add(scrollPane);
@@ -81,10 +114,10 @@ public class VisitsCheduleForm extends JFrame {
         table.setDefaultEditor(Object.class, null);
         table.setForeground(Color.white);
         table.setModel(new DefaultTableModel(
-                new Object[][] {
+                new Object[][]{
                         {null, null, null},
                 },
-                new String[] {
+                new String[]{
                         "VisittorID", "VisitDate", "PrisonerID"
                 }
         ));
@@ -99,27 +132,6 @@ public class VisitsCheduleForm extends JFrame {
         lblTitle.setFont(new Font("UTM Aircona", Font.PLAIN, 20));
         lblTitle.setForeground(Color.YELLOW);
         panelAdd.add(lblTitle);
-
-        String [] cbSearch = {"All", "prisonerid", "visitorid"};
-        bs=new JComboBox(cbSearch);
-        bs.setBounds(100, 60, 150, 19);
-        panelVC.add(bs);
-
-        tftSearch =new JTextField();
-        tftSearch.setBounds(260, 60, 130, 19);
-        panelVC.add(tftSearch);
-
-        JButton btSearch =new JButton("Search");
-        btSearch.setBounds(410, 60, 90, 20);
-        panelVC.add(btSearch);
-        btSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getListVisitSearch(bs.getSelectedItem().toString());
-                showTableSearch();
-            }
-        });
-
 
         JLabel lblVisitorID = new JLabel("VisitorID:");
         lblVisitorID.setBounds(180, 77, 60, 13);
@@ -142,8 +154,8 @@ public class VisitsCheduleForm extends JFrame {
         lblVisit.setForeground(Color.white);
 
         UtilDateModel model1 = new UtilDateModel();
-        JDatePanelImpl dateOfBirth = new JDatePanelImpl(model1,p);
-        JDatePickerImpl dateArrestPicker = new JDatePickerImpl(dateOfBirth,new DateLabelFormatter());
+        JDatePanelImpl dateOfBirth = new JDatePanelImpl(model1, p);
+        JDatePickerImpl dateArrestPicker = new JDatePickerImpl(dateOfBirth, new DateLabelFormatter());
         dateArrestPicker.setBounds(265, 108, 150, 19);
         panelAdd.add(dateArrestPicker);
 
@@ -158,7 +170,6 @@ public class VisitsCheduleForm extends JFrame {
         panelAdd.add(tftPrisonerID);
 
 
-
         JButton btnDone = new JButton("Done");
         btnDone.setBounds(246, 186, 85, 21);
         panelAdd.add(btnDone);
@@ -168,48 +179,65 @@ public class VisitsCheduleForm extends JFrame {
                 String visitorID = tftVisitorID.getText();
                 Timestamp visitDate = getTimeStamp(dateArrestPicker.getJFormattedTextField().getText());
                 Integer prisonerID = Integer.parseInt(tftPrisonerID.getText());
-                VisitsChedule vc=new VisitsChedule();
+                VisitsChedule vc = new VisitsChedule();
                 vc.setVisitorid(visitorID);
                 vc.setVisitdate(visitDate);
                 vc.setPrisonerid(prisonerID);
-                DBConnection db=new DBConnection();
-                if(db.check("checkPrisonerId", String.valueOf(prisonerID))){
-                    Timestamp lastVisitDate = db.checkVisitDate(visitorID);
-                    long lastTime = lastVisitDate.getTime();
-                    long currentTime = visitDate.getTime();
-                    long limitTime = 2592000000L;
+                DBConnection db = new DBConnection();
+                if (db.checkprisonerID("checkprisonerid", visitorID) == prisonerID) {
+                    if (db.check("checkrelative", visitorID)) {
+                        int check = db.checkRelative(visitorID);
+                        if(prisonerID != null){
+                            if(check == prisonerID){
+                                if (db.check("checkPrisonerId", String.valueOf(prisonerID))) {
+                                    Timestamp lastVisitDate = db.checkVisitDate(visitorID);
+                                    if (lastVisitDate == null) {
+                                         db.Create(vc);
+                                        JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
+                                        getListVisit();
+                                        showTable();
+                                    }
+                                    long lastTime = lastVisitDate.getTime();
+                                    long currentTime = visitDate.getTime();
+                                    long limitTime = 2592000000L;
 
-                    if(currentTime - lastTime >= limitTime ) {
-                        db.Create(vc);
-                        JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
-                        getListVisit();
-                        showTable();
+                                    if (currentTime - lastTime >= limitTime) {
+                                        db.Create(vc);
+                                        JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
+                                        getListVisit();
+                                        showTable();
+                                    } else {
+                                        JOptionPane.showMessageDialog(dateArrestPicker, "Not enough time yet !!");
+                                    }
+                                }
+                            }else {
+                                JOptionPane.showMessageDialog(dateArrestPicker, "PrisonerID incorrect !!");
+                            }
+                        }else {
+                            JOptionPane.showMessageDialog(dateArrestPicker, "VisitorID incorrect !!");
+                        }
                     }
-                    else {
-                        JOptionPane.showMessageDialog(dateArrestPicker, "test !!");
-
-                    }
-                }else {
-                    JOptionPane.showMessageDialog(dateArrestPicker,"Add Fails !!");
+                } else {
+                    JOptionPane.showMessageDialog(dateArrestPicker, "This visitor is not a relative of the prisoner with id " + prisonerID + " !!");
                 }
             }
         });
-
-
         setVisible(true);
     }
-    public Timestamp getTimeStamp(String date){
+
+    public Timestamp getTimeStamp(String date) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date parsedDate = dateFormat.parse(date);
             Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
             return timestamp;
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-    public void showTable(){
+
+    public void showTable() {
         model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
         list = getListVisit();
@@ -219,16 +247,17 @@ public class VisitsCheduleForm extends JFrame {
             });
         }
     }
-    public ArrayList<VisitsChedule> getListVisit(){
-        ArrayList<VisitsChedule> list=new ArrayList<>();
+
+    public ArrayList<VisitsChedule> getListVisit() {
+        ArrayList<VisitsChedule> list = new ArrayList<>();
         String sql = "select * from visitschedule ";
 
-        try{
+        try {
             String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
-            Connection conn= DriverManager.getConnection(connectionUrl);
+            Connection conn = DriverManager.getConnection(connectionUrl);
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 VisitsChedule l = new VisitsChedule();
                 l.setVisitorid(rs.getString("VisitorID"));
                 l.setVisitdate(rs.getTimestamp("VisitDate"));
@@ -240,22 +269,24 @@ public class VisitsCheduleForm extends JFrame {
         }
         return list;
     }
-    public ArrayList<VisitsChedule> getListVisitSearch(String search){
-        ArrayList<VisitsChedule> listSearch=new ArrayList<>();
+
+    public ArrayList<VisitsChedule> getListVisitSearch(String search) {
+        ArrayList<VisitsChedule> listSearch = new ArrayList<>();
         String sql = "";
-        if(search.equals("All")){
+        if (search.equals("All")) {
             sql = "select * from visitschedule";
-        }else if(search.equals("prisonerid")){
+
+        } else if (search.equals("prisonerid")) {
             sql = "select * from visitschedule where prisonerid = " + tftSearch.getText();
-        }else if (search.equals("visitorid")){
+        } else if (search.equals("visitorid")) {
             sql = "select * from visitschedule where visitorid = '" + tftSearch.getText() + "'";
         }
-        try{
+        try {
             String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
-            Connection conn= DriverManager.getConnection(connectionUrl);
+            Connection conn = DriverManager.getConnection(connectionUrl);
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()){
+            while (rs.next()) {
                 VisitsChedule l = new VisitsChedule();
                 l.setVisitorid(rs.getString("VisitorID"));
                 l.setVisitdate(rs.getTimestamp("VisitDate"));
@@ -267,7 +298,8 @@ public class VisitsCheduleForm extends JFrame {
         }
         return listSearch;
     }
-    public void showTableSearch(){
+
+    public void showTableSearch() {
         model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
         list = getListVisitSearch(bs.getSelectedItem().toString());
@@ -277,6 +309,7 @@ public class VisitsCheduleForm extends JFrame {
             });
         }
     }
+
     public boolean isCellEditable(int row, int col)/// lam bang k chinh sua dc
     {
         return false;
