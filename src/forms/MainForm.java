@@ -1,17 +1,15 @@
 package forms;
 
 
-import javax.imageio.ImageIO;
+import utils.DBConnection;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.Collection;
 
 public class MainForm extends JFrame {
-    public MainForm(){
+    public MainForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Prison Management");
         setBounds(370, 55, 720, 600);
@@ -36,16 +34,12 @@ public class MainForm extends JFrame {
 
         JMenu mnSystem = new JMenu("System");
         menuBar.add(mnSystem);
-        JMenuItem mniLogout = new JMenuItem("Login");
-        mnSystem.add(mniLogout);
 
         JMenuItem mniExit = new JMenuItem("Exit");
         mnSystem.add(mniExit);
-        mniExit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
+        mniExit.addActionListener(e -> {
+            this.dispose();
+            MainLoginForm mlf = new MainLoginForm("");
         });
 
 
@@ -72,8 +66,34 @@ public class MainForm extends JFrame {
                 dispose();
             }
         });
+        JMenuItem itemAddPrisoner = new JMenuItem("Add Prisoner/Relative");
+        itemAddPrisoner.addActionListener(e -> {
+            PrisonerForm pf = new PrisonerForm();
+        });
+        mnNewMenu.add(itemAddPrisoner);
+
+        JMenuItem itemEditPrisoner = new JMenuItem("Prisoner/Relative List");
+        itemEditPrisoner.addActionListener(e -> {
+            EditMainForm edm = new EditMainForm("Prisoner/Relative List");
+        });
+        mnNewMenu.add(itemEditPrisoner);
+        JMenuItem itemAddCity = new JMenuItem("Add City/Country");
+        itemAddCity.addActionListener(e -> {
+            AddCityAndCountry a = new AddCityAndCountry();
+        });
+        mnNewMenu.add(itemAddCity);
+        DBConnection db = new DBConnection();
+        if (db.checkAccess(LoginForm.userName)) {
+            JMenuItem itemGivePriority = new JMenuItem("Give Priority");
+            itemGivePriority.addActionListener(e -> {
+                GivePriority g = new GivePriority();
+            });
+            mnNewMenu.add(itemGivePriority);
+
+        }
         setVisible(true);
 
     }
+
 
 }

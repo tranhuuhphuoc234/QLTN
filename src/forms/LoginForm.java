@@ -74,7 +74,7 @@ public class LoginForm extends JDialog {
                 pfPass.setText(null);
                 pfPass.setEchoChar(originalEchoChar);
                 getOwner().setVisible(false);
-                EditMainForm emf = new EditMainForm("A");
+                MainForm mf = new MainForm();
 
             } else {
                 lblWarn.setText("Wrong password");

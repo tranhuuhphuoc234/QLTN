@@ -10,7 +10,6 @@ import static forms.EditMainForm.tablePrisoner;
 
 public class PopClickListener extends MouseAdapter {
     public static String relativeid ;
-    int r;
     public void mouseReleased(MouseEvent e){
         int r =  EditMainForm.tableRelative.rowAtPoint(e.getPoint());
         if(r>= 0 && r < EditMainForm.tableRelative.getRowCount()){
@@ -27,6 +26,7 @@ public class PopClickListener extends MouseAdapter {
             if ( ((JTable) e.getComponent()).getColumnCount() == 9) {
                 relativeEdit(e);
             }
+
             else {
                 prisonerEdit(e);
             }
@@ -48,6 +48,7 @@ public class PopClickListener extends MouseAdapter {
             if (((JTable) e.getComponent()).getColumnCount() == 9) {
                 relativeEdit(e);
             }
+
             else
             {
                 prisonerEdit(e);

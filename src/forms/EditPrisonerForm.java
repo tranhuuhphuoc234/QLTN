@@ -198,8 +198,6 @@ public class EditPrisonerForm extends JDialog {
         btn.setBounds(180, 530, 120, 25);
         btn.addActionListener(e -> {
 
-            System.out.println(Integer.parseInt(boxDanger.getSelectedItem().toString()));
-            System.out.println(dangerSelected);
             if (crimeSelected.equals(boxCrime.getSelectedItem().toString()) && dangerSelected == Integer.parseInt(boxDanger.getSelectedItem().toString()) && punishmentSelected.equals(boxPunishment.getSelectedItem().toString()) && cellroomSelected.equals(boxCellroom.getSelectedItem().toString())) {
                 lblWarn.setText("Save successfully");
                 lblWarn.setForeground(Color.green);

@@ -36,7 +36,7 @@ public class PrisonerForm extends JDialog {
 
     public PrisonerForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setTitle("Prisoner Details");
+        setTitle("Information Details");
         setBounds(200, 100, 800, 600);
 
         JPanel tabInfo = new JPanel();

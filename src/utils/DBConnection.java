@@ -260,7 +260,30 @@ public class DBConnection<T> {
         }
         return "";
     }
-
+    public DefaultTableModel getUsers(){
+        try(Connection con = DriverManager.getConnection(urlConnection))
+        {
+            String query = "Select username from users where checkacc is null or checkacc = 0";
+            Statement stmt = con.createStatement();
+            DefaultTableModel model = new DefaultTableModel(){
+                public boolean isCellEditable(int row,int col)
+                {
+                    return false;
+                }
+            };
+            model.addColumn("UserName");
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+            {
+                String username = rs.getString("username");
+                model.addRow(new Object[] {username});
+            }
+            return  model;
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }return null;
+    }
     public DefaultTableModel getRelative(String name, String value){
         try (Connection con = DriverManager.getConnection(urlConnection))
         {
