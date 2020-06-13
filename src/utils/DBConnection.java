@@ -284,6 +284,25 @@ public class DBConnection<T> {
             e.printStackTrace();
         }return null;
     }
+    public boolean updatePassword(String username, String password)
+    { try(Connection con = DriverManager.getConnection(urlConnection))
+    {
+        String query = "update users set password = '"+password+"' where username ='"+username+"'";
+        Statement stmt = con.createStatement();
+        int check = stmt.executeUpdate(query);
+        if ( check!= 0)
+        {
+            return  true;
+        }
+        else
+        {
+            return false;
+        }
+    }catch (SQLException e )
+    {
+        e.printStackTrace();
+    }return false;
+    }
     public DefaultTableModel getRelative(String name, String value){
         try (Connection con = DriverManager.getConnection(urlConnection))
         {

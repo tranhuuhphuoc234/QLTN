@@ -34,7 +34,11 @@ public class MainForm extends JFrame {
 
         JMenu mnSystem = new JMenu("System");
         menuBar.add(mnSystem);
-
+        JMenuItem changePass = new JMenuItem("Change Password");
+        changePass.addActionListener(e -> {
+            ChangePassForm cpf = new ChangePassForm();
+        });
+        mnSystem.add(changePass);
         JMenuItem mniExit = new JMenuItem("Exit");
         mnSystem.add(mniExit);
         mniExit.addActionListener(e -> {
