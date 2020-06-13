@@ -1,38 +1,24 @@
 package forms;
 
 import models.entities.Visitor;
-import utils.DBConnection;
-import forms.DateLabelFormatter;
-import models.entities.Visitor;
-import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
 import utils.DBConnection;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
 import java.util.Vector;
 
-import static java.lang.Boolean.*;
-
-public class InformationVisitor extends JFrame {
+public class InformationVisitor extends JDialog {
     private JPanel panel;
     JDatePickerImpl dateVisitPicker;
-    private String header[]={ "IdCard", "Name", "Gender", "PhoneNumber", "Address", "City", "Country","Relationship"};
-    private DefaultTableModel tableModel= new DefaultTableModel(header,0);
+    private String header[] = {"IdCard", "Name", "Gender", "PhoneNumber", "Address", "City", "Country", "Relationship"};
+    private DefaultTableModel tableModel = new DefaultTableModel(header, 0);
 
     public InformationVisitor() throws HeadlessException {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(2);
+        setTitle("Add Visitor");
         panel = (JPanel) getContentPane();
         panel.setLayout(null);
 
@@ -55,7 +41,7 @@ public class InformationVisitor extends JFrame {
 
         JLabel lblPhoneNumber = new JLabel("PhoneNumber");
         lblPhoneNumber.setFont(new Font("Tahoma", Font.BOLD, 12));
-        lblPhoneNumber.setBounds(148, 135, 100, 30  );
+        lblPhoneNumber.setBounds(148, 135, 100, 30);
         this.add(lblPhoneNumber);
 
 
@@ -109,7 +95,7 @@ public class InformationVisitor extends JFrame {
         //======================
         // JCombobox
         JComboBox comboGender = new JComboBox();
-        comboGender.setModel(new DefaultComboBoxModel(new String[] {"", "Female", "Male"}));
+        comboGender.setModel(new DefaultComboBoxModel(new String[]{"", "Female", "Male"}));
         comboGender.setBounds(275, 101, 245, 21);
         comboGender.setForeground(new Color(255, 255, 255));
         comboGender.setBackground(new Color(0, 0, 0));
@@ -120,9 +106,9 @@ public class InformationVisitor extends JFrame {
         // Select City, Province, Country
         DBConnection db = new DBConnection();
 
-        String STCity = ","+db.getAllName("City");
+        String STCity = "," + db.getAllName("City");
         String[] Citys = STCity.split(",");
-        JComboBox comboBox_City= new JComboBox(Citys);
+        JComboBox comboBox_City = new JComboBox(Citys);
         JSplitPane splitCity = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitCity.add(comboBox_City);
         splitCity.setBounds(770, 20, 245, 21);
@@ -131,7 +117,7 @@ public class InformationVisitor extends JFrame {
         //===============================
 
         //================================
-        String stringCountry = ","+db.getAllName("Country");
+        String stringCountry = "," + db.getAllName("Country");
         String[] country = stringCountry.split(",");
         JComboBox comboBox_Country = new JComboBox(country);
         JSplitPane splitCountry = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -156,15 +142,16 @@ public class InformationVisitor extends JFrame {
 
         JTable table = new JTable();
         table.setModel(new DefaultTableModel(
-                new Object[][] {
+                new Object[][]{
                 },
-                new String[] {
-                        "Idcard", "Name", "Gender", "PhoneNumber", "Address", "City", "Country","Relationship"
+                new String[]{
+                        "Idcard", "Name", "Gender", "PhoneNumber", "Address", "City", "Country", "Relationship"
                 }
         ) {
-            Class[] columnTypes = new Class[] {
+            Class[] columnTypes = new Class[]{
                     String.class, String.class, Object.class, String.class, String.class, String.class, String.class
             };
+
             public Class getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];
             }
@@ -178,14 +165,14 @@ public class InformationVisitor extends JFrame {
         btnAdd.setBounds(851, 196, 93, 30);
         this.add(btnAdd);
         btnAdd.addActionListener(e -> {
-            String Idcard=textFieldidcard.getText();
-            String FullName=textFieldName.getText();
-            String Gender=comboGender.getSelectedItem().toString();
-            String PhoneNumber=textFieldphone.getText();
-            String Address=textPaneAddress.getText();
+            String Idcard = textFieldidcard.getText();
+            String FullName = textFieldName.getText();
+            String Gender = comboGender.getSelectedItem().toString();
+            String PhoneNumber = textFieldphone.getText();
+            String Address = textPaneAddress.getText();
             int City = db.getColumnID("city", comboBox_City.getSelectedItem().toString());
             int Country = db.getColumnID("country", comboBox_Country.getSelectedItem().toString());
-            String Relationship=textField_relationship.getText();
+            String Relationship = textField_relationship.getText();
             Visitor visitor = new Visitor();
             visitor.setVisitoridcard(Idcard);
             visitor.setVisitorname(FullName);
@@ -199,59 +186,60 @@ public class InformationVisitor extends JFrame {
                 Connection conn = DriverManager.getConnection(connectionUrl);
                 String sql = "insert into visitor(visitorid,visitorname,gender,vistorphone,visitoraddress,city,country,relationship)  values(?,?,?,?,?,?,?,?)";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
-                preparedStatement.setString(1,Idcard);
+                preparedStatement.setString(1, Idcard);
                 preparedStatement.setString(2, FullName);
-                preparedStatement.setString(3,Gender);
-                preparedStatement.setString(4,PhoneNumber );
+                preparedStatement.setString(3, Gender);
+                preparedStatement.setString(4, PhoneNumber);
                 preparedStatement.setString(5, Address);
                 preparedStatement.setString(6, String.valueOf(City));
                 preparedStatement.setString(7, String.valueOf(Country));
-                preparedStatement.setString(8,Relationship);
-                if (!Idcard.equals("")){
-                    if (!FullName.equals("")){
-                        if(!Gender.equals("")){
-                                if (!PhoneNumber.equals("")) {
-                                    if (!Address.equals("")){
+                preparedStatement.setString(8, Relationship);
+                if (!Idcard.equals("")) {
+                    if (!FullName.equals("")) {
+                        if (!Gender.equals("")) {
+                            if (!PhoneNumber.equals("")) {
+                                if (!Address.equals("")) {
 //                                        if (City.setS){
 //                                                if (!Country.equals("")){
-                                                    if (CheckIdcard(Idcard)){
-                                                        if (CheckPhone(PhoneNumber)){
-                                                            preparedStatement.execute();
-                                                            JOptionPane.showMessageDialog(rootPane,"Add Success");
-                                                            textFieldidcard.setText("");
-                                                            textFieldName.setText("");
-                                                            comboGender.setSelectedItem("");;
-                                                            textFieldphone.setText("");
-                                                            textPaneAddress.setText("");
-                                                            comboBox_City.setSelectedItem("");
-                                                            comboBox_Country.setSelectedItem("");
-                                                            textField_relationship.setText("");
-                                                        }else {
-                                                            JOptionPane.showMessageDialog(rootPane,"PhoneNumber was available");
-                                                        }
-                                                    }else {
-                                                        JOptionPane.showMessageDialog(rootPane,"CMND was available");
-                                                    }
+                                    if (CheckIdcard(Idcard)) {
+                                        if (CheckPhone(PhoneNumber)) {
+                                            preparedStatement.execute();
+                                            JOptionPane.showMessageDialog(rootPane, "Add Success");
+                                            textFieldidcard.setText("");
+                                            textFieldName.setText("");
+                                            comboGender.setSelectedItem("");
+                                            ;
+                                            textFieldphone.setText("");
+                                            textPaneAddress.setText("");
+                                            comboBox_City.setSelectedItem("");
+                                            comboBox_Country.setSelectedItem("");
+                                            textField_relationship.setText("");
+                                        } else {
+                                            JOptionPane.showMessageDialog(rootPane, "PhoneNumber was available");
+                                        }
+                                    } else {
+                                        JOptionPane.showMessageDialog(rootPane, "CMND was available");
+                                    }
 //                                                }else {
 //                                                    JOptionPane.showMessageDialog(rootPane,"Wrong Country");
 //                                                }
 //                                        }else {
 //                                            JOptionPane.showMessageDialog(rootPane,"Wrong City");
 //                                        }
-                                    }else {
-                                        JOptionPane.showMessageDialog(rootPane,"Wrong Address");
-                                    }
-                                }else {
-                                    JOptionPane.showMessageDialog(rootPane,"Wrong PhoneNumber");
+                                } else {
+                                    JOptionPane.showMessageDialog(rootPane, "Wrong Address");
                                 }
-                        }else {
-                            JOptionPane.showMessageDialog(rootPane,"Wrong Gender");
+                            } else {
+                                JOptionPane.showMessageDialog(rootPane, "Wrong PhoneNumber");
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(rootPane, "Wrong Gender");
                         }
-                    }else {
-                        JOptionPane.showMessageDialog(rootPane,"Wrong FullName");
+                    } else {
+                        JOptionPane.showMessageDialog(rootPane, "Wrong FullName");
                     }
-                }else {
-                    JOptionPane.showMessageDialog(rootPane,"Wrong CMND");
+                } else {
+                    JOptionPane.showMessageDialog(rootPane, "Wrong CMND");
                 }
             } catch (ClassNotFoundException classNotFoundException) {
                 classNotFoundException.printStackTrace();
@@ -267,32 +255,32 @@ public class InformationVisitor extends JFrame {
         this.add(btnRefresh);
         btnRefresh.addActionListener(e -> {
             textFieldsearch.setText("");
-            String Search=textFieldsearch.getText();
-            Connection c=null;
-            Statement st=null;
-            ResultSet rs=null;
+            String Search = textFieldsearch.getText();
+            Connection c = null;
+            Statement st = null;
+            ResultSet rs = null;
             try {
-                c=DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456");
+                c = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456");
                 // command watch data
-                String sql="select visitorid, visitorname, gender, vistorphone, visitoraddress, cityname, countryname, relationship"+" from visitor join city on visitor.city=cityid join country on visitor.country=countryid";
+                String sql = "select visitorid, visitorname, gender, vistorphone, visitoraddress, cityname, countryname, relationship" + " from visitor join city on visitor.city=cityid join country on visitor.country=countryid";
                 //if search by title
-                if(Search.length()>0){
-                    sql = sql + " where visitorid like '%" + Search +"%'";
+                if (Search.length() > 0) {
+                    sql = sql + " where visitorid like '%" + Search + "%'";
                 }
                 //create object thu thi command select
-                st=c.createStatement();
+                st = c.createStatement();
                 //thu thi
-                rs=st.executeQuery(sql);
+                rs = st.executeQuery(sql);
                 Vector data = null;
                 tableModel.setRowCount(0);
                 // if relatives aren't available
-                if (rs.isBeforeFirst()==false){
-                    JOptionPane.showMessageDialog(this,"Relatives aren't available");
+                if (rs.isBeforeFirst() == false) {
+                    JOptionPane.showMessageDialog(this, "Relatives aren't available");
                     return;
                 }
                 //while not get data
-                while(rs.next()){
-                    data=new Vector();
+                while (rs.next()) {
+                    data = new Vector();
                     data.add(rs.getString("visitorid"));
                     data.add(rs.getString("visitorname"));
                     data.add(rs.getString("gender"));
@@ -309,18 +297,18 @@ public class InformationVisitor extends JFrame {
 
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
-            }finally {
+            } finally {
                 try {
-                    if (c != null){
+                    if (c != null) {
                         c.close();
                     }
-                    if (st !=null){
+                    if (st != null) {
                         st.close();
                     }
-                    if (rs != null){
+                    if (rs != null) {
                         rs.close();
                     }
-                }catch (Exception ee){
+                } catch (Exception ee) {
                     ee.printStackTrace();
                 }
             }
@@ -332,32 +320,32 @@ public class InformationVisitor extends JFrame {
         btnSearch.setBounds(212, 236, 85, 21);
         this.add(btnSearch);
         btnSearch.addActionListener(e -> {
-            String Search=textFieldsearch.getText();
-            Connection c=null;
-            Statement st=null;
-            ResultSet rs=null;
+            String Search = textFieldsearch.getText();
+            Connection c = null;
+            Statement st = null;
+            ResultSet rs = null;
             try {
-                c=DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456");
+                c = DriverManager.getConnection("jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456");
                 // command watch data
-                String sql="select * from visitor";
+                String sql = "select * from visitor";
                 //if search by title
-                if(Search.length()>0){
-                    sql = sql + " where visitorid like '%" + Search +"%'";
+                if (Search.length() > 0) {
+                    sql = sql + " where visitorid like '%" + Search + "%'";
                 }
                 //create object thu thi command select
-                st=c.createStatement();
+                st = c.createStatement();
                 //thu thi
-                rs=st.executeQuery(sql);
+                rs = st.executeQuery(sql);
                 Vector data = null;
                 tableModel.setRowCount(0);
                 // if relatives aren't available
-                if (rs.isBeforeFirst()==false){
-                    JOptionPane.showMessageDialog(this,"Relatives aren't available");
+                if (rs.isBeforeFirst() == false) {
+                    JOptionPane.showMessageDialog(this, "Relatives aren't available");
                     return;
                 }
                 //while not get data
-                while(rs.next()){
-                    data=new Vector();
+                while (rs.next()) {
+                    data = new Vector();
                     data.add(rs.getString("visitorid"));
                     data.add(rs.getString("visitorname"));
                     data.add(rs.getString("gender"));
@@ -373,18 +361,18 @@ public class InformationVisitor extends JFrame {
                 table.setModel(tableModel);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
-            }finally {
+            } finally {
                 try {
-                    if (c != null){
+                    if (c != null) {
                         c.close();
                     }
-                    if (st !=null){
+                    if (st != null) {
                         st.close();
                     }
-                    if (rs != null){
+                    if (rs != null) {
                         rs.close();
                     }
-                }catch (Exception ee){
+                } catch (Exception ee) {
                     ee.printStackTrace();
                 }
             }
@@ -395,6 +383,7 @@ public class InformationVisitor extends JFrame {
         setBounds(30, 70, 1201, 505);
         setVisible(true);
     }
+
     //Check CMND
     public boolean CheckIdcard(String Idcard) {
         String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
@@ -426,11 +415,6 @@ public class InformationVisitor extends JFrame {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        InformationVisitor informationVisitor=new InformationVisitor();
-
     }
 }
 

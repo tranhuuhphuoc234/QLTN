@@ -13,11 +13,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
-public class AddCrimePunishment extends JFrame {
+public class AddCrimePunishment extends JDialog {
     private JPanel panel;
 
     public AddCrimePunishment() throws HeadlessException {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(2);
+        setTitle("Add Crime/Punishment");
         panel=(JPanel) getContentPane();
         panel.setLayout(null);
 
@@ -86,7 +87,7 @@ public class AddCrimePunishment extends JFrame {
         textField_punishment.setColumns(10);
 
         JComboBox comboBox_datepusinhment = new JComboBox();
-        comboBox_datepusinhment.setModel(new DefaultComboBoxModel(new String[] {"Select", "ngay ", "thang ", "nam"}));
+        comboBox_datepusinhment.setModel(new DefaultComboBoxModel(new String[] {"Select", "ngày ", "tháng ", "năm"}));
         comboBox_datepusinhment.setBounds(193, 87, 96, 21);
         panel_punishment.add(comboBox_datepusinhment);
 
@@ -119,8 +120,5 @@ public class AddCrimePunishment extends JFrame {
             e.printStackTrace();
         }
         return false;
-    }
-    public static void main(String[] args) {
-        AddCrimePunishment addCrimePunishment=new AddCrimePunishment();
     }
 }

@@ -78,6 +78,17 @@ public class MainForm extends JFrame {
             AddCityAndCountry a = new AddCityAndCountry();
         });
         mnNewMenu.add(itemAddCity);
+        JMenuItem itemAddCrimeAndPunishment = new JMenuItem("Add Crime/Punishment");
+        itemAddCrimeAndPunishment.addActionListener(e -> {
+            AddCrimePunishment a = new AddCrimePunishment();
+        });
+        mnNewMenu.add(itemAddCrimeAndPunishment);
+        JMenuItem itemVisitor = new JMenuItem("Add Visitor");
+        itemVisitor.addActionListener(e -> {
+            InformationVisitor iv = new InformationVisitor();
+        });
+        mnNewMenu.add(itemVisitor);
+
         DBConnection db = new DBConnection();
         if (db.checkAccess(LoginForm.userName)) {
             JMenuItem itemGivePriority = new JMenuItem("Give Priority");
