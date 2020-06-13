@@ -174,41 +174,32 @@ public class VisitsCheduleForm extends JDialog {
                 vc.setVisitdate(visitDate);
                 vc.setPrisonerid(prisonerID);
                 DBConnection db = new DBConnection();
-                if (db.checkprisonerID("checkprisonerid", visitorID) == prisonerID) {
-                    if (db.check("checkrelative", visitorID)) {
-                        int check = db.checkRelative(visitorID);
-                        if(prisonerID != null){
-                            if(check == prisonerID){
-                                if (db.check("checkPrisonerId", String.valueOf(prisonerID))) {
-                                    Timestamp lastVisitDate = db.checkVisitDate(visitorID);
-                                    if (lastVisitDate == null) {
-                                         db.Create(vc);
-                                        JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
-                                        getListVisit();
-                                        showTable();
-                                    }
-                                    long lastTime = lastVisitDate.getTime();
-                                    long currentTime = visitDate.getTime();
-                                    long limitTime = 2592000000L;
-
-                                    if (currentTime - lastTime >= limitTime) {
-                                        db.Create(vc);
-                                        JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
-                                        getListVisit();
-                                        showTable();
-                                    } else {
-                                        JOptionPane.showMessageDialog(dateArrestPicker, "Not enough time yet !!");
-                                    }
-                                }
-                            }else {
-                                JOptionPane.showMessageDialog(dateArrestPicker, "PrisonerID incorrect !!");
+                if (db.check("checkrelative", visitorID)) {
+                    if (prisonerID != null) {
+                        if (db.check("checkPrisonerId", String.valueOf(prisonerID))) {
+                            Timestamp lastVisitDate = db.checkVisitDate(visitorID);
+                            if (lastVisitDate == null) {
+                                db.Create(vc);
+                                JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
+                                getListVisit();
+                                showTable();
                             }
-                        }else {
-                            JOptionPane.showMessageDialog(dateArrestPicker, "VisitorID incorrect !!");
+                            long lastTime = lastVisitDate.getTime();
+                            long currentTime = visitDate.getTime();
+                            long limitTime = 2592000000L;
+
+                            if (currentTime - lastTime >= limitTime) {
+                                db.Create(vc);
+                                JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
+                                getListVisit();
+                                showTable();
+                            } else {
+                                JOptionPane.showMessageDialog(dateArrestPicker, "Last visit date: " + lastVisitDate + ". Not enough time yet !!");
+                            }
                         }
+                    } else {
+                        JOptionPane.showMessageDialog(dateArrestPicker, "VisitorID incorrect !!");
                     }
-                } else {
-                    JOptionPane.showMessageDialog(dateArrestPicker, "This visitor is not a relative of the prisoner with id " + prisonerID + " !!");
                 }
             }
         });
