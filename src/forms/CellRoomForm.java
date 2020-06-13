@@ -16,15 +16,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CellRoomForm extends JFrame {
+public class CellRoomForm extends JDialog {
     DefaultTableModel model;
     private JTable table;
     private JTable tableUpdate;
     private ArrayList<prisonerlist> list;
     public CellRoomForm() {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(2);
         setIconImage(Toolkit.getDefaultToolkit().getImage("code\\QLTN\\src\\models\\image\\polic.png"));
         setTitle("CellRoom Form");
+        setModal(true);
         setBounds(250, 200, 1101, 350);
         setLayout(null);
         JPanel contentPane = new JPanel();
@@ -34,18 +35,6 @@ public class CellRoomForm extends JFrame {
 
         JMenuBar mnb=new JMenuBar();
         setJMenuBar(mnb);
-
-        JMenu menu=new JMenu("Menu");
-        mnb.add(menu);
-        JMenuItem mni=new JMenuItem("Logout");
-        menu.add(mni);
-        mni.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-                MainForm mf=new MainForm();
-            }
-        });
 
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 10));
@@ -304,7 +293,6 @@ public class CellRoomForm extends JFrame {
         btnSearch.setFont(new Font("Arial", Font.PLAIN, 15));
         btnSearch.setBounds(266, 35, 140, 40);
         panelSearch.add(btnSearch);
-        setVisible(true);
         btnSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

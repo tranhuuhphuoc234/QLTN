@@ -1,8 +1,10 @@
 package app;
-import forms.*;
+
+import forms.ChangePassForm;
+import forms.MainLoginForm;
+
 public class program {
     public static void main(String[] args) {
-       InformationVisitor iv = new InformationVisitor();
-
+        MainLoginForm m = new MainLoginForm("");
     }
 }

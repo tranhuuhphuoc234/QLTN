@@ -53,22 +53,14 @@ public class MainForm extends JFrame {
 
         JMenuItem mntmAddsCell = new JMenuItem("Cell Room");
         mnNewMenu.add(mntmAddsCell);
-        mntmAddsCell.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                CellRoomForm crf = new CellRoomForm();
-                dispose();
-            }
+        mntmAddsCell.addActionListener(e -> {
+            CellRoomForm c = new CellRoomForm();
         });
 
         JMenuItem mntmVisitChedule = new JMenuItem("Visit Chedule");
         mnNewMenu.add(mntmVisitChedule);
-        mntmVisitChedule.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                VisitsCheduleForm vcf = new VisitsCheduleForm();
-                dispose();
-            }
+        mntmVisitChedule.addActionListener(e -> {
+            VisitsCheduleForm vcf = new VisitsCheduleForm();
         });
         JMenuItem itemAddPrisoner = new JMenuItem("Add Prisoner/Relative");
         itemAddPrisoner.addActionListener(e -> {

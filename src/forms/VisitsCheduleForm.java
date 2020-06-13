@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
-public class VisitsCheduleForm extends JFrame {
+public class VisitsCheduleForm extends JDialog {
     DefaultTableModel model;
     private ArrayList<VisitsChedule> list;
     private JTable table;
@@ -26,6 +26,7 @@ public class VisitsCheduleForm extends JFrame {
 
     public VisitsCheduleForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setModal(true);
         setTitle("VisitsChedule Form");
         setBounds(400, 230, 600, 350);
         setLayout(null);
@@ -41,17 +42,6 @@ public class VisitsCheduleForm extends JFrame {
         JMenuBar mnb = new JMenuBar();
         setJMenuBar(mnb);
 
-        JMenu menu = new JMenu("Menu");
-        mnb.add(menu);
-        JMenuItem mni = new JMenuItem("Logout");
-        menu.add(mni);
-        mni.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-                MainForm mf = new MainForm();
-            }
-        });
 
         //----------------VisitCheduleForm----------------------
 
