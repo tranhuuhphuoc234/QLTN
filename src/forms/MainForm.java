@@ -70,7 +70,7 @@ public class MainForm extends JFrame {
 
         JMenuItem itemEditPrisoner = new JMenuItem("Prisoner/Relative List");
         itemEditPrisoner.addActionListener(e -> {
-            EditMainForm edm = new EditMainForm("Prisoner/Relative List");
+            EditMainForm edm = new EditMainForm();
         });
         mnNewMenu.add(itemEditPrisoner);
         JMenuItem itemAddCity = new JMenuItem("Add City/Country");

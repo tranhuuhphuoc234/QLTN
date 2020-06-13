@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-public class EditMainForm extends JFrame {
+public class EditMainForm extends JDialog {
     JTextField tfSearchRelative;
     JComboBox  boxRelativeSelect;
     public static JTable tableRelative,tablePrisoner;
@@ -20,9 +20,9 @@ public class EditMainForm extends JFrame {
     JPanel pnlImg;
     String idcard;
     File dir;
-    public EditMainForm(String title) throws HeadlessException {
-        super(title);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    public EditMainForm() throws HeadlessException {
+        setTitle("Prisoner/Relative List");
+        setDefaultCloseOperation(2);
         setBounds(100,100,1400,600);
         DBConnection db = new DBConnection();
 

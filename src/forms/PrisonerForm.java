@@ -402,7 +402,7 @@ public class PrisonerForm extends JDialog {
                 if (db.Create(p1) && db.Create(ph1)) {
                     for (int i = 0; i < selectedFiles.length; i++) {
                         File dir = new File("src\\images\\" + tfIdCard.getText());
-                        dir.mkdir();
+                        dir.mkdirs();
                         File file = new File(selectedFiles[i].getAbsolutePath());
                         file.renameTo(new File("src\\images\\" + tfIdCard.getText() + "\\" + i + ".jpg"));
                     }
