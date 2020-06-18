@@ -35,6 +35,7 @@ public class PrisonerForm extends JDialog {
     CardLayout card = new CardLayout();
 
     public PrisonerForm() {
+        setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Information Details");
         setBounds(200, 100, 800, 600);
@@ -114,8 +115,10 @@ public class PrisonerForm extends JDialog {
         JLabel lblCity = new JLabel("City");
         lblCity.setBounds(30, 310, 80, 25);
         tabInfo.add(lblCity);
-
-        String stringCity = "Select," + db.getAllName("city");
+        String stringCity = "";
+        if (db.checkTable("city")) {
+             stringCity = "Select," + db.getAllName("city");
+        }
         String[] city = stringCity.split(",");
         boxCity = new JComboBox(city);
         boxCity.setBounds(150, 310, 200, 25);
@@ -132,8 +135,10 @@ public class PrisonerForm extends JDialog {
         JLabel lblCountry = new JLabel("Country");
         lblCountry.setBounds(30, 350, 80, 25);
         tabInfo.add(lblCountry);
-
-        String stringCountry = "Select," + db.getAllName("country");
+        String stringCountry = "";
+        if(db.checkTable("country")) {
+            stringCountry = "Select," + db.getAllName("country");
+        }
         String[] country = stringCountry.split(",");
         boxCountry = new JComboBox(country);
         boxCountry.setBounds(150, 350, 200, 25);
@@ -172,8 +177,10 @@ public class PrisonerForm extends JDialog {
         JLabel lblCrime = new JLabel("Crime");
         lblCrime.setBounds(30, 30, 80, 25);
         tabCrime.add(lblCrime);
-
-        String stringCrime = "Select," + db.getAllName("crime");
+        String stringCrime = "";
+        if( db.checkTable("crime")) {
+             stringCrime = "Select," + db.getAllName("crime");
+        }
         String[] crime = stringCrime.split(",");
         boxCrime = new JComboBox(crime);
         boxCrime.setBounds(150, 30, 200, 25);
@@ -191,8 +198,10 @@ public class PrisonerForm extends JDialog {
         JLabel lblPunishment = new JLabel("Punishment");
         lblPunishment.setBounds(30, 110, 80, 25);
         tabCrime.add(lblPunishment);
-
-        String stringPunishment = "Select," + db.getAllName("punishment");
+        String stringPunishment = "";
+        if (db.checkTable("punishment")) {
+            stringPunishment = "Select," + db.getAllName("punishment");
+        }
         String[] punishment = stringPunishment.split(",");
         boxPunishment = new JComboBox(punishment);
         boxPunishment.setBounds(150, 110, 200, 25);
@@ -211,8 +220,10 @@ public class PrisonerForm extends JDialog {
         JLabel lblcellroom = new JLabel("Cell room");
         lblcellroom.setBounds(30, 190, 80, 25);
         tabCrime.add(lblcellroom);
-
-        String stringCellroom = "Select," + db.getAllName("cellroom");
+        String stringCellroom = "";
+        if (db.checkTable("cellroom")) {
+            stringCellroom = "Select," + db.getAllName("cellroom");
+        }
         String[] cellroom = stringCellroom.split(",");
         boxCellroom = new JComboBox(cellroom);
         boxCellroom.setBounds(150, 190, 200, 25);
@@ -406,7 +417,8 @@ public class PrisonerForm extends JDialog {
                         File file = new File(selectedFiles[i].getAbsolutePath());
                         file.renameTo(new File("src\\images\\" + tfIdCard.getText() + "\\" + i + ".jpg"));
                     }
-
+                    int lastId = db.getLastId() +1;
+                    lblLastId.setText(String.valueOf(lastId));
                     tfIdCard.setText(null);
                     tfName.setText(null);
                     tfAge.setText(null);
@@ -423,9 +435,9 @@ public class PrisonerForm extends JDialog {
                     pnlImg.removeAll();
                     pnlImg.repaint();
                     pnlImg.revalidate();
+                    pnlImg.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                     lblWarn.setText("Save successfully");
                     lblWarn.setForeground(Color.green);
-                    lblLastId.setText(String.valueOf(db.getLastId()));
                 }
 
             }
@@ -513,6 +525,18 @@ public class PrisonerForm extends JDialog {
                     if (db.updateRelativePrisoner(String.valueOf(prisonerid), String.valueOf(db.callProc("findrelativeid", idcard)))) {
                         lblWarnRel.setText("Save successfully");
                         lblWarnRel.setForeground(Color.green);
+                        tfRelativeIDCard.setText(null);
+                        tfRelativeName.setText(null);
+                        tfRelativeAge.setText(null);
+                        tfRelativePhone.setText(null);
+                        tfRelativeAddress.setText(null);
+                        tfRelationship.setText(null);
+                        tfPrisonerId.setText(null);
+                        boxRelativeCity.setSelectedIndex(0);
+                        boxRelativeCountry.setSelectedIndex(0);
+
+
+
                     }
                 }
             }

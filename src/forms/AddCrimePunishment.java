@@ -18,6 +18,7 @@ public class AddCrimePunishment extends JDialog {
 
     public AddCrimePunishment() throws HeadlessException {
         setDefaultCloseOperation(2);
+        setModal(true);
         setTitle("Add Crime/Punishment");
         panel=(JPanel) getContentPane();
         panel.setLayout(null);
@@ -95,6 +96,31 @@ public class AddCrimePunishment extends JDialog {
         btaddpunishment.setFont(new Font("Tahoma", Font.BOLD, 12));
         btaddpunishment.setBounds(204, 134, 85, 21);
         panel_punishment.add(btaddpunishment);
+        btaddpunishment.addActionListener(e -> {
+            String tfpunishment=textField_punishment.getText();
+            String boxpunishment=comboBox_datepusinhment.getSelectedItem().toString();
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
+                Connection conn = DriverManager.getConnection(connectionUrl);
+                String query = tfpunishment+" "+boxpunishment;
+                String sql = "insert into punishment(punishmentname)  values(N'"+query+"')";
+                PreparedStatement ps = conn.prepareStatement(sql);
+                if (!tfpunishment.equals("")){
+                    ps.execute();
+                    JOptionPane.showMessageDialog(rootPane,"Success");
+                    textField_punishment.setText("");
+                    comboBox_datepusinhment.setSelectedItem("select");
+                }else {
+                    JOptionPane.showMessageDialog(rootPane,"Please fill in the blanks");
+                }
+            } catch (ClassNotFoundException classNotFoundException) {
+                classNotFoundException.printStackTrace();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
+        });
 
         JLabel lblinforpunishment = new JLabel("Information Punishment");
         lblinforpunishment.setFont(new Font("Tahoma", Font.ITALIC, 13));

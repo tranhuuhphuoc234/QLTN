@@ -35,7 +35,7 @@ public class DBConnection<T> {
             }
             query = query.substring(0, query.length() - 1);
             query += ")";
-            System.out.println(query);
+
             PreparedStatement pstmt = con.prepareStatement(query);
             int check = pstmt.executeUpdate();
             if (check == 1) {
@@ -259,6 +259,22 @@ public class DBConnection<T> {
             e.printStackTrace();
         }
         return "";
+    }
+    public boolean checkTable(String tableName){
+        try (Connection con = DriverManager.getConnection(urlConnection))
+        {
+            String query = "Select * from "+tableName;
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+            {
+                return true;
+            }
+
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }return false;
     }
     public DefaultTableModel getUsers(){
         try(Connection con = DriverManager.getConnection(urlConnection))

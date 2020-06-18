@@ -15,6 +15,7 @@ public class InformationVisitor extends JDialog {
     JDatePickerImpl dateVisitPicker;
     private String header[] = {"IdCard", "Name", "Gender", "PhoneNumber", "Address", "City", "Country", "Relationship"};
     private DefaultTableModel tableModel = new DefaultTableModel(header, 0);
+    JComboBox comboBox_Country;
 
     public InformationVisitor() throws HeadlessException {
         setDefaultCloseOperation(2);
@@ -105,21 +106,34 @@ public class InformationVisitor extends JDialog {
 
         // Select City, Province, Country
         DBConnection db = new DBConnection();
-
-        String STCity = "," + db.getAllName("City");
+        String STCity = "";
+        if(db.checkTable("city")) {
+            STCity = "," + db.getAllName("city");
+        }
         String[] Citys = STCity.split(",");
         JComboBox comboBox_City = new JComboBox(Citys);
         JSplitPane splitCity = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitCity.add(comboBox_City);
         splitCity.setBounds(770, 20, 245, 21);
+        comboBox_City.addActionListener(e -> {
+            String columnName = db.getLocation("country", comboBox_City.getSelectedItem().toString());
+            comboBox_Country.setSelectedItem(columnName);
+            comboBox_Country.enable();
+            if (comboBox_City.getSelectedIndex() != 0) {
+                comboBox_Country.disable();
+            }
+        });
 
         add(splitCity);
         //===============================
 
         //================================
-        String stringCountry = "," + db.getAllName("Country");
+        String stringCountry = "";
+        if(db.checkTable("country")) {
+            stringCountry = "," + db.getAllName("country");
+        }
         String[] country = stringCountry.split(",");
-        JComboBox comboBox_Country = new JComboBox(country);
+        comboBox_Country = new JComboBox(country);
         JSplitPane splitCountry = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitCountry.add(comboBox_Country);
         splitCountry.setBounds(770, 86, 245, 21);

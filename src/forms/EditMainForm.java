@@ -21,6 +21,7 @@ public class EditMainForm extends JDialog {
     String idcard;
     File dir;
     public EditMainForm() throws HeadlessException {
+        setModal(true);
         setTitle("Prisoner/Relative List");
         setDefaultCloseOperation(2);
         setBounds(100,100,1400,600);
@@ -59,7 +60,7 @@ public class EditMainForm extends JDialog {
         pnlResultRelative.setBorder(line);
 
         tableRelative = new JTable();
-        tableRelative.addMouseListener(new PopClickListener());
+        tableRelative.addMouseListener(new PopClickListenerRelative());
         tableRelative.setModel(db.getRelative("All",""));
         JScrollPane spRelative = new JScrollPane(tableRelative);
         spRelative.setPreferredSize(new Dimension(1,300));
@@ -113,33 +114,45 @@ public class EditMainForm extends JDialog {
 
         JButton btnFind = new JButton("Find");
         btnFind.setBounds(475,180,120,25);
-
-        String stringCrime = "Crime," + db.getAllName("crime");
+        String stringCrime = "";
+        if (db.checkTable("crime")) {
+            stringCrime = "Crime," + db.getAllName("crime");
+        }
         String[] crime = stringCrime.split(",");
         JComboBox boxCrime = new JComboBox(crime);
         boxCrime.setBounds(400, 70, 200, 25);
         pnlSearchPrisoner.add(boxCrime);
 
-
-        String stringPunishment = "Punishment," + db.getAllName("punishment");
+        String stringPunishment = "";
+        if(db.checkTable("punishment")) {
+            stringPunishment = "Punishment," + db.getAllName("punishment");
+        }
         String[] punishment = stringPunishment.split(",");
         JComboBox boxPunishment = new JComboBox(punishment);
         boxPunishment.setBounds(400, 110, 200, 25);
         pnlSearchPrisoner.add(boxPunishment);
 
-        String stringCellroom = "Cellroom,"+db.getAllName("cellroom");
+        String stringCellroom = "";
+        if( db.checkTable("cellroom")) {
+            stringCellroom = "Cellroom," + db.getAllName("cellroom");
+        }
         String[] cellroom = stringCellroom.split(",");
         JComboBox boxCellroom = new JComboBox(cellroom);
         boxCellroom.setBounds(700,30,200,25);
         pnlSearchPrisoner.add(boxCellroom);
-
-        String stringCity = "City," + db.getAllName("city");
+        String stringCity = "";
+        if (db.checkTable("city")) {
+             stringCity = "City," + db.getAllName("city");
+        }
         String[] city = stringCity.split(",");
         JComboBox boxCity = new JComboBox(city);
         boxCity.setBounds(700, 70, 200, 25);
         pnlSearchPrisoner.add(boxCity);
 
-        String stringCountry = "Country," + db.getAllName("country");
+        String stringCountry = "";
+        if(db.checkTable("country")) {
+             stringCountry = "Country," + db.getAllName("country");
+        }
         String[] country = stringCountry.split(",");
         JComboBox boxCountry = new JComboBox(country);
         boxCountry.setBounds(700, 110, 200, 25);
@@ -250,14 +263,14 @@ public class EditMainForm extends JDialog {
             }
         };
         tablePrisoner.setModel(db.findPrisoner("All",""));
-        tablePrisoner.addMouseListener(new PopClickListener());
+        tablePrisoner.addMouseListener(new PopClickListenerPrisoner());
         tablePrisoner.getSelectionModel().addListSelectionListener(e -> {
           idcard = "";
-            try {
-               idcard = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 1).toString();
-          } catch (Exception ex)
+          try {
+              idcard = tablePrisoner.getValueAt(tablePrisoner.getSelectedRow(), 1).toString();
+          } catch (Exception e1)
           {
-              ex.printStackTrace();
+              e1.printStackTrace();
           }
             dir = new File("src\\images\\"+idcard);
             if(dir.exists())

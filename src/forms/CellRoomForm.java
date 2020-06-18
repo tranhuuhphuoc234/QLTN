@@ -75,8 +75,10 @@ public class CellRoomForm extends JDialog {
         lblCellroomType.setBounds(51, 110, 100, 13);
         lblCellroomType.setForeground(Color.white);
         panelAdd.add(lblCellroomType);
-
-        String stringCellroomtype = "Select,"+db.getAllName("cellroomtype");
+        String stringCellroomtype = "";
+        if(db.checkTable("cellroomtype")) {
+            stringCellroomtype = "Select," + db.getAllName("cellroomtype");
+        }
         String[] cellroomtype = stringCellroomtype.split(",");
         JComboBox cbCellroomtype = new JComboBox(cellroomtype);
         JSplitPane splitCellroomtype = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -277,8 +279,10 @@ public class CellRoomForm extends JDialog {
         lblCellRoomSearch.setForeground(Color.white);
         lblCellRoomSearch.setBounds(22, 47, 87, 13);
         panelSearch.add(lblCellRoomSearch);
-
-        String stringCellroom = "All,"+db.getAllNameCellroom("cellroom");
+        String stringCellroom = "";
+        if(db.checkTable("cellroom")) {
+            stringCellroom = "All," + db.getAllNameCellroom("cellroom");
+        }
         final String[][] cellroom = {stringCellroom.split(",")};
         JComboBox cbCellroom = new JComboBox(cellroom[0]);
         JSplitPane splitCellroom = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

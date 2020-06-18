@@ -5,13 +5,11 @@ import utils.DBConnection;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class EditRelativeForm extends JDialog {
     JComboBox boxCity,boxCountry;
     DBConnection db = new DBConnection();
-    DefaultTableModel tbl = db.findRelative(PopClickListener.relativeid);
+    DefaultTableModel tbl = db.findRelative(PopClickListenerRelative.relativeid);
     String idCard = tbl.getValueAt(0,0).toString();
     String name = tbl.getValueAt(0,1).toString();
     String age = tbl.getValueAt(0,2).toString();

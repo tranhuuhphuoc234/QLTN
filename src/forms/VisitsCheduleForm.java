@@ -183,23 +183,31 @@ public class VisitsCheduleForm extends JDialog {
                                 JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
                                 getListVisit();
                                 showTable();
-                            }
-                            long lastTime = lastVisitDate.getTime();
-                            long currentTime = visitDate.getTime();
-                            long limitTime = 2592000000L;
-
-                            if (currentTime - lastTime >= limitTime) {
-                                db.Create(vc);
-                                JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
-                                getListVisit();
-                                showTable();
                             } else {
-                                JOptionPane.showMessageDialog(dateArrestPicker, "Last visit date: " + lastVisitDate + ". Not enough time yet !!");
+                                long lastTime = lastVisitDate.getTime();
+                                long currentTime = visitDate.getTime();
+                                long limitTime = 2592000000L;
+
+                                if (currentTime - lastTime >= limitTime) {
+                                    db.Create(vc);
+                                    JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
+                                    getListVisit();
+                                    showTable();
+                                } else {
+                                    JOptionPane.showMessageDialog(dateArrestPicker, "Last visit date: " + lastVisitDate + ". Not enough time yet !!");
+                                }
                             }
+                        } else {
+                            JOptionPane.showMessageDialog(dateArrestPicker, "Could not find prisoner ");
+
                         }
                     } else {
-                        JOptionPane.showMessageDialog(dateArrestPicker, "VisitorID incorrect !!");
+                        JOptionPane.showMessageDialog(dateArrestPicker, "Please enter Prisoner ID");
+
                     }
+                } else {
+                    JOptionPane.showMessageDialog(dateArrestPicker, "VisitorID incorrect !!");
+
                 }
             }
         });

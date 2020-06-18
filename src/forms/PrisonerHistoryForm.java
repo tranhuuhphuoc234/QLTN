@@ -8,6 +8,7 @@ import java.awt.*;
 
 public class PrisonerHistoryForm extends JDialog {
     public PrisonerHistoryForm(){
+        setModal(true);
         setTitle("Prisoner History");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());

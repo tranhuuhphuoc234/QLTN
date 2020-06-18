@@ -5,8 +5,15 @@ import models.entities.country;
 import utils.DBConnection;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.lang.reflect.Array;
 
 public class AddCityAndCountry extends JDialog {
+    String strCountry = "";
+    JComboBox boxCountry;
+    String [] arrCountry;
+
     public AddCityAndCountry(){
         setTitle("Add City/Country");
         setModal(true);
@@ -29,9 +36,18 @@ public class AddCityAndCountry extends JDialog {
         btnAddCountry.addActionListener(e -> {
             DBConnection db = new DBConnection();
             String contryname = tfCountryName.getText();
-            country c = new country();
-            c.setCountryname(contryname);
-            db.Create(c);
+            if ( !contryname.isEmpty()) {
+                country c = new country();
+                c.setCountryname(contryname);
+                if (db.Create(c)){
+                    JOptionPane.showMessageDialog(rootPane,"Save successfully");
+                    tfCountryName.setText(null);
+                }
+            }
+            else{
+                JOptionPane.showMessageDialog(rootPane,"Please enter all required information");
+
+            }
         });
         pnlCountry.add(btnAddCountry);
 
@@ -52,9 +68,11 @@ public class AddCityAndCountry extends JDialog {
         pnlCity.add(lblCountryName);
 
         DBConnection db = new DBConnection();
-        String strCountry = db.getAllName("country");
-        String [] arrCountry = strCountry.split(",");
-        JComboBox boxCountry = new JComboBox(arrCountry);
+        if(db.checkTable("country")) {
+            strCountry = "Select,"+db.getAllName("country");
+        }
+        arrCountry = strCountry.split(",");
+        boxCountry = new JComboBox(arrCountry);
         boxCountry.setBounds(200,70,200,25);
         pnlCity.add(boxCountry);
 
@@ -62,17 +80,39 @@ public class AddCityAndCountry extends JDialog {
         btnAddCity.setBounds(160,120,120,25);
         btnAddCity.addActionListener(e -> {
             String cityname = tfCityName.getText();
-            int country = db.getColumnID("country",boxCountry.getSelectedItem().toString());
-            city c = new city();
-            c.setCityname(cityname);
-            c.setCountry(country);
-            db.Create(c);
+            if ( !cityname.isEmpty()||boxCountry.getSelectedItem().equals("Select")) {
+                int country = db.getColumnID("country", boxCountry.getSelectedItem().toString());
+                city c = new city();
+                c.setCityname(cityname);
+                c.setCountry(country);
+                if ( db.Create(c)){
+                    JOptionPane.showMessageDialog(rootPane,"Save successfully");
+                    tfCityName.setText(null);
+                    boxCountry.setSelectedIndex(0);
+                }
+
+            }
+            else {
+                JOptionPane.showMessageDialog(rootPane,"Please enter all required information");
+
+            }
+
+
         });
 
         pnlCity.add(btnAddCity);
-
         tabbedPane.add(pnlCity,"City");
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                DBConnection db = new DBConnection();
+                String strArr = db.getAllName("country");
+                String [] Arr = strArr.split(",");
+                boxCountry.setModel( new DefaultComboBoxModel(Arr));
+            }
+        });
         add(tabbedPane);
+
         setVisible(true);
     }
 }
+
