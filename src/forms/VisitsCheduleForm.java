@@ -1,6 +1,7 @@
 package forms;
 
 import models.entities.VisitsChedule;
+import models.entities.relative;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
@@ -16,17 +17,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
+import models.entities.relative;
 
 public class VisitsCheduleForm extends JDialog {
     DefaultTableModel model;
     private ArrayList<VisitsChedule> list;
     private JTable table;
-    private JTextField tftSearch;
+    private JTextField tftSearch, tftVisitorID;
     private JComboBox bs;
+    private ArrayList<relative> listRelative;
 
     public VisitsCheduleForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setModal(true);
+//        setModal(true);
         setTitle("VisitsChedule Form");
         setBounds(400, 230, 600, 350);
         setLayout(null);
@@ -128,7 +131,7 @@ public class VisitsCheduleForm extends JDialog {
         panelAdd.add(lblVisitorID);
         lblVisitorID.setForeground(Color.white);
 
-        JTextField tftVisitorID = new JTextField();
+        tftVisitorID = new JTextField();
         tftVisitorID.setBounds(265, 74, 150, 19);
         panelAdd.add(tftVisitorID);
         tftVisitorID.setColumns(10);
@@ -137,6 +140,18 @@ public class VisitsCheduleForm extends JDialog {
         p.put("text.today", "Today");
         p.put("text.month", "Month");
         p.put("text.year", "Year");
+
+        JButton btnSearch=new JButton("Search");
+        btnSearch.setBounds(450, 71, 90, 27);
+        panelAdd.add(btnSearch);
+        btnSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CheckRelative cr=new CheckRelative();
+                cr.getListRelative(tftVisitorID.getText());
+                cr.showTableCheckRelative(tftVisitorID.getText());
+            }
+        });
 
         JLabel lblVisit = new JLabel("VisitDate:");
         lblVisit.setBounds(170, 113, 60, 13);
@@ -303,4 +318,5 @@ public class VisitsCheduleForm extends JDialog {
     {
         return false;
     }
+
 }
