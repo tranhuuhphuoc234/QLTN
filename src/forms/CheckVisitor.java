@@ -1,7 +1,7 @@
 package forms;
 
 import models.entities.VisitsChedule;
-import models.entities.relative;
+import models.entities.listvisitor;
 import forms. VisitsCheduleForm;
 
 import javax.swing.*;
@@ -13,12 +13,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-public class CheckRelative extends JDialog {
-    ArrayList<relative> listRelative;
+public class CheckVisitor extends JDialog {
+    ArrayList<listvisitor> listVisitors;
     private JPanel contentPane;
     DefaultTableModel model;
     public static JTable table;
-    public CheckRelative(){
+    public CheckVisitor(){
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setBounds(250, 200, 738, 253);
         contentPane = new JPanel();
@@ -36,7 +36,7 @@ public class CheckRelative extends JDialog {
                 new Object[][] {
                 },
                 new String[] {
-                         "relativeidcard", "relativename", "relativeage", "relativephone", "relativeaddress", "city", "country", "relationship", "prisonerid"
+                         "visitorid", "visitorname", "visitorphone", "visitoraddress", "city", "country", "relationship"
                 }
         ));
         table.setDefaultEditor(Object.class, null);
@@ -44,9 +44,9 @@ public class CheckRelative extends JDialog {
         table.addMouseListener(new PopClickCL());
         setVisible(true);
     }
-    public ArrayList<relative> getListRelative(String value) {
-        ArrayList<relative> listRelative = new ArrayList<>();
-        String sql = "select * from relative where relativeidcard = '" + value + "'";
+    public ArrayList<listvisitor>  getListRelative(String value) {
+        ArrayList<listvisitor> listVisitors = new ArrayList<>();
+        String sql = "select * from visitor where visitorid = '" + value + "'";
 
         try {
             String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=QLTN;user=sa;password=123456";
@@ -54,31 +54,29 @@ public class CheckRelative extends JDialog {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                relative l = new relative();
-                l.setRelativeidcard(rs.getString("relativeidcard"));
-                l.setRelativename(rs.getString("relativename"));
-                l.setRelativeage(rs.getInt("relativeage"));
-                l.setRelativephone(rs.getString("relativephone"));
-                l.setRelativeaddress(rs.getString("relativeaddress"));
+                listvisitor l = new listvisitor();
+                l.setVisitorid(rs.getString("visitorid"));
+                l.setVisitorname(rs.getString("visitorname"));
+                l.setVisitorphone(rs.getString("vistorphone"));
+                l.setVisitoraddress(rs.getString("visitoraddress"));
                 l.setCity(rs.getInt("city"));
                 l.setCountry(rs.getInt("country"));
                 l.setRelationship(rs.getString("relationship"));
-                l.setPrisonerid(rs.getInt("prisonerid"));
-                listRelative.add(l);
+                listVisitors.add(l);
             }
         } catch (Exception throwables) {
             throwables.printStackTrace();
         }
-        return listRelative;
+        return listVisitors;
     }
 
     public void showTableCheckRelative(String value) {
         model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
-        listRelative = getListRelative(value);
-        for (relative l : listRelative) {
+        listVisitors = getListRelative(value);
+        for (listvisitor l : listVisitors) {
             model.addRow(new Object[]{
-                    l.getRelativeidcard(), l.getRelativename(), l.getRelativeage(), l.getRelativephone(), l.getRelativeaddress(), l.getCity(), l.getCountry(), l.getRelationship(), l.getPrisonerid()
+                    l.getVisitorid(), l.getVisitorname(), l.getVisitorphone(), l.getVisitoraddress(), l.getCity(), l.getCountry(), l.getRelationship()
             });
         }
     }

@@ -17,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
-import models.entities.relative;
 
 public class VisitsCheduleForm extends JDialog {
     DefaultTableModel model;
@@ -29,7 +28,6 @@ public class VisitsCheduleForm extends JDialog {
 
     public VisitsCheduleForm() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//        setModal(true);
         setTitle("VisitsChedule Form");
         setBounds(400, 230, 600, 350);
         setLayout(null);
@@ -141,13 +139,13 @@ public class VisitsCheduleForm extends JDialog {
         p.put("text.month", "Month");
         p.put("text.year", "Year");
 
-        JButton btnSearch=new JButton("Search");
+        JButton btnSearch = new JButton("Search");
         btnSearch.setBounds(450, 71, 90, 27);
         panelAdd.add(btnSearch);
         btnSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CheckRelative cr=new CheckRelative();
+                CheckVisitor cr = new CheckVisitor();
                 cr.getListRelative(tftVisitorID.getText());
                 cr.showTableCheckRelative(tftVisitorID.getText());
             }
@@ -181,48 +179,51 @@ public class VisitsCheduleForm extends JDialog {
         btnDone.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String visitorID = tftVisitorID.getText();
-                Timestamp visitDate = getTimeStamp(dateArrestPicker.getJFormattedTextField().getText());
-                Integer prisonerID = Integer.parseInt(tftPrisonerID.getText());
-                VisitsChedule vc = new VisitsChedule();
-                vc.setVisitorid(visitorID);
-                vc.setVisitdate(visitDate);
-                vc.setPrisonerid(prisonerID);
-                DBConnection db = new DBConnection();
-                if (db.check("checkrelative", visitorID)) {
-                    if (prisonerID != null) {
-                        if (db.check("checkPrisonerId", String.valueOf(prisonerID))) {
-                            Timestamp lastVisitDate = db.checkVisitDate(visitorID);
-                            if (lastVisitDate == null) {
-                                db.Create(vc);
-                                JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
-                                getListVisit();
-                                showTable();
-                            } else {
-                                long lastTime = lastVisitDate.getTime();
-                                long currentTime = visitDate.getTime();
-                                long limitTime = 2592000000L;
 
-                                if (currentTime - lastTime >= limitTime) {
+                DBConnection db = new DBConnection();
+                if (!tftVisitorID.getText().equals("")) {
+                    if(getTimeStamp(dateArrestPicker.getJFormattedTextField().getText()) != null ){
+                        if(!tftPrisonerID.getText().equals("")){
+                            String visitorID = tftVisitorID.getText();
+                            Timestamp visitDate = getTimeStamp(dateArrestPicker.getJFormattedTextField().getText());
+                            Integer prisonerID = Integer.parseInt(tftPrisonerID.getText());
+                            VisitsChedule vc = new VisitsChedule();
+                            vc.setVisitorid(visitorID);
+                            vc.setVisitdate(visitDate);
+                            vc.setPrisonerid(prisonerID);
+                            if (db.check("checkPrisonerId", String.valueOf(prisonerID))) {
+                                Timestamp lastVisitDate = db.checkVisitDate(visitorID);
+                                if (lastVisitDate == null) {
                                     db.Create(vc);
                                     JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
                                     getListVisit();
                                     showTable();
                                 } else {
-                                    JOptionPane.showMessageDialog(dateArrestPicker, "Last visit date: " + lastVisitDate + ". Not enough time yet !!");
-                                }
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(dateArrestPicker, "Could not find prisoner ");
+                                    long lastTime = lastVisitDate.getTime();
+                                    long currentTime = visitDate.getTime();
+                                    long limitTime = 2592000000L;
 
+                                    if (currentTime - lastTime >= limitTime) {
+                                        db.Create(vc);
+                                        JOptionPane.showMessageDialog(dateArrestPicker, "Add Success !!");
+                                        getListVisit();
+                                        showTable();
+                                    } else {
+                                        JOptionPane.showMessageDialog(dateArrestPicker, "Last visit date: " + lastVisitDate + ". Not enough time yet !!");
+                                    }
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(dateArrestPicker, "Could not find prisoner ");
+                            }
+                        }else {
+                            JOptionPane.showMessageDialog(dateArrestPicker, "Please enter Prisoner ID");
                         }
-                    } else {
-                        JOptionPane.showMessageDialog(dateArrestPicker, "Please enter Prisoner ID");
+                    }else {
+                        JOptionPane.showMessageDialog(dateArrestPicker, "Please enter VisitDate");
 
                     }
                 } else {
-                    JOptionPane.showMessageDialog(dateArrestPicker, "VisitorID incorrect !!");
-
+                    JOptionPane.showMessageDialog(dateArrestPicker, "Please enter Visitor ID");
                 }
             }
         });
